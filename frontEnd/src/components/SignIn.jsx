@@ -25,7 +25,13 @@ function Copyright(props) {
 
 // TODO remove, this demo shouldn't need to reset the theme.
 
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+    palette: {
+        primary: {
+            main: "#2e7d32",
+        },
+    },
+});
 
 export default function SignIn() {
   const handleSubmit = (event) => {
@@ -39,7 +45,7 @@ export default function SignIn() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="xs" sx={{ backgroundColor: '#f0f0f0', borderRadius: 3, border: '2px solid green', marginTop: 10, marginBottom: 5}}>
         <CssBaseline />
         <Box
           sx={{
@@ -92,7 +98,7 @@ export default function SignIn() {
             </Button>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
+        <Copyright sx={{ mt: 4, mb: 4 }} />
       </Container>
     </ThemeProvider>
   );
