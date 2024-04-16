@@ -45,7 +45,7 @@ export default function SignIn() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs" sx={{ backgroundColor: '#f0f0f0', borderRadius: 3, border: '2px solid green', marginTop: 10, marginBottom: 5}}>
+      <Container component="main" maxWidth="xs" sx={{ backgroundColor: '#f2f3f4', borderRadius: 3, border: '2px solid green', marginTop: 10, marginBottom: 5}}>
         <CssBaseline />
         <Box
           sx={{
@@ -68,10 +68,10 @@ export default function SignIn() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
               autoFocus
             />
             <TextField
