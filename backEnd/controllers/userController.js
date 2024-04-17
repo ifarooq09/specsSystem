@@ -22,6 +22,8 @@ const createUser = async (req, res) => {
                 email,
                 password
             })
+
+            
         }
 
     } catch (error) {
