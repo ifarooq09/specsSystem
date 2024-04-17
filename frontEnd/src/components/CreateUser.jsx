@@ -37,7 +37,7 @@ export default function SignUp() {
     });
   };
 
-  const addUserData = (event) => {
+  const addUserData = async (event) => {
     event.preventDefault();
 
     const { firstName, lastName, email, password } = inputVal;
@@ -55,7 +55,20 @@ export default function SignUp() {
     } else if (password.length < 8) {
       alert("Password must be of atleast 8 characters");
     } else {
-      console.log("User registration successfully done");
+      // console.log("User registration successfully done");
+
+      const data = await fetch("http://localhost:3000/createUser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          firstName, lastName, email, password
+        })
+      })
+
+      const res = await data.json();
+      console.log(res)
     }
   };
 

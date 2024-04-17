@@ -3,14 +3,19 @@ import * as dotenv from 'dotenv'
 import cors from 'cors'
 
 import connectDb from './db/conn.js'
+import userRouter from './routes/userRouter.js'
 
 dotenv.config()
 const app = express()
 const port = 3000
 
-app.get('/', (req, res) => {
-    res.send({ message: 'Your backend server is running successfully'})
-})
+app.use(cors());
+
+app.use(express.json());
+app.use(userRouter);
+// app.get('/', (req, res) => {
+//     res.send({ message: 'Your backend server is running successfully'})
+// })
 
 const startServer = async () => {
     try{
