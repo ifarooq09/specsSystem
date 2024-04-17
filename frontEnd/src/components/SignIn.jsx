@@ -2,13 +2,12 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useState } from 'react';
 
 function Copyright(props) {
   return (
@@ -34,13 +33,40 @@ const defaultTheme = createTheme({
 });
 
 export default function SignIn() {
-  const handleSubmit = (event) => {
+
+  const [loginVal, setLoginVal] = useState({
+    email: "",
+    password: ""
+  })
+
+  const loginValue = (event) => {
+    const {name, value} = event.target;
+
+    setLoginVal(() =>{
+      return {
+        ...loginVal,
+        [name]: value
+      }
+    })
+  }
+
+  const loginUser = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      username: data.get('username'),
-      password: data.get('password'),
-    });
+    
+    const {email, password} = loginVal;
+
+   if (email === "") {
+      alert("Enter your Email Address");
+    } else if (!email.includes("@")) {
+      alert("Enter valid Email");
+    } else if (password === "") {
+      alert("Enter password");
+    } else if (password.length < 8) {
+      alert("Password must be of atleast 8 characters");
+    } else {
+      console.log("Loged Successfully");
+    }
+
   };
 
   return (
@@ -63,30 +89,30 @@ export default function SignIn() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={loginUser} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
               fullWidth
-              id="username"
-              label="Username"
-              name="username"
-              autoComplete="username"
+              id="email"
+              label="Email"
+              name="email"
+              value={loginVal.email}
+              autoComplete="email"
               autoFocus
+              onChange={loginValue}
             />
             <TextField
               margin="normal"
               required
               fullWidth
               name="password"
+              value={loginVal.password}
               label="Password"
               type="password"
               id="password"
               autoComplete="current-password"
-            />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
+              onChange={loginValue}
             />
             <Button
               type="submit"
