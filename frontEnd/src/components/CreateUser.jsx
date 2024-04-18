@@ -70,6 +70,13 @@ export default function SignUp() {
       const res = await data.json();
       console.log(res)
     }
+
+    setInputVal({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: ""
+    })
   };
 
   return (
@@ -151,7 +158,7 @@ export default function SignUp() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              Create
             </Button>
           </Box>
         </Box>
