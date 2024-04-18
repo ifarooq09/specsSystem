@@ -1,5 +1,6 @@
 import userModel from "../models/userSchema.js";
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs"
 
 
 const createUser = async (req, res) => {
@@ -33,4 +34,29 @@ const createUser = async (req, res) => {
     }
 }
 
-export { createUser };
+const login = async (req, res) => {
+    const {email, password} = req.body;
+
+    if (!email || !password) {
+        res.status(422).json({ error: "fill all the details"})
+    }
+
+    try {
+        const userValid = await userModel.findOne({email: email});
+
+        if(userValid) {
+            const isMatch = await bcrypt.compare(password, userValid.password)
+
+            if(!isMatch) {
+                res.status(422).json({ error: "password is incorrect"})
+            } else {
+                //token generation
+                const token = await userValid.generateAuthtoken();
+            }
+        }
+    } catch (error) {
+        
+    }
+}
+
+export { createUser, login };

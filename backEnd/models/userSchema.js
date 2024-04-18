@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken";
+
+const key = "MySonNameIsMohammadSadqiMustafa_"
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -28,7 +31,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         minlength:8,
     },
-    token: [
+    tokens: [
         {
             token: {
                 type: String,
@@ -45,6 +48,19 @@ userSchema.pre("save", async function(next){
 
     await next();
 })
+
+//token generation
+userSchema.methods.generateAuthtoken = async function() {
+    try {
+        let userToken = jwt.sign({_id:this._id, key},{
+            expiresIn: "1d"
+        });
+
+        this.tokens = this.tokens.concat({token: userToken})
+    } catch (error) {
+        
+    }
+}
 
 const userModel = new mongoose.model("users", userSchema);
 

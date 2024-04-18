@@ -50,7 +50,7 @@ export default function SignIn() {
     })
   }
 
-  const loginUser = (event) => {
+  const loginUser = async (event) => {
     event.preventDefault();
     
     const {email, password} = loginVal;
@@ -64,9 +64,21 @@ export default function SignIn() {
     } else if (password.length < 8) {
       alert("Password must be of atleast 8 characters");
     } else {
-      console.log("Loged Successfully");
-    }
+      // console.log("Loged Successfully");
 
+      const data = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      await data.json();
+    }
   };
 
   return (

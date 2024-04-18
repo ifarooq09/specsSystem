@@ -1,6 +1,7 @@
 import express from 'express'
 import * as dotenv from 'dotenv'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 
 import connectDb from './db/conn.js'
 import userRouter from './routes/userRouter.js'
@@ -9,9 +10,10 @@ dotenv.config()
 const app = express()
 const port = 3000
 
-app.use(cors());
-
 app.use(express.json());
+app.use(cors());
+app.use(cookieParser());
+
 app.use(userRouter);
 // app.get('/', (req, res) => {
 //     res.send({ message: 'Your backend server is running successfully'})
