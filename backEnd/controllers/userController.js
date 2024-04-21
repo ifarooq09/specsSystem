@@ -45,13 +45,26 @@ const login = async (req, res) => {
         const userValid = await userModel.findOne({email: email});
 
         if(userValid) {
-            const isMatch = await bcrypt.compare(password, userValid.password)
+            const isMatch = await bcrypt.compare(password, userValid.password);
 
             if(!isMatch) {
-                res.status(422).json({ error: "password is incorrect"})
+                res.status(422).json({ error: "password is incorrect"});
             } else {
                 //token generation
                 const token = await userValid.generateAuthtoken();
+
+                //cookie generate
+                res.cookie("usercookie", token, {
+                    expires: new Date(Date.now()+9000000),
+                    httpOnly:true
+                });
+
+                const result = {
+                    userValid,
+                    token
+                }
+
+                res.status(200).json({ status: 200, result })
             }
         }
     } catch (error) {

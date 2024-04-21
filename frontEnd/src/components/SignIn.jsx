@@ -77,7 +77,12 @@ export default function SignIn() {
         }),
       });
 
-      await data.json();
+      const res = await data.json();
+
+      if(res.status === 200) {
+        localStorage.setItem("usersdatatoken", res.result.token)
+        setLoginVal({...loginVal, email:"", password:""})
+      }
     }
   };
 

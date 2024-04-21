@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken";
-
-const key = "MySonNameIsMohammadSadqiMustafa_"
+import { key } from "../key.js";
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -21,7 +20,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
         validate(value) {
-            if(!validator.isEmail(value)) {
+            if (!validator.isEmail(value)) {
                 throw new Error("Not Valid Email")
             }
         }
@@ -29,7 +28,7 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minlength:8,
+        minlength: 8,
     },
     tokens: [
         {
@@ -43,22 +42,26 @@ const userSchema = new mongoose.Schema({
 
 //hash password
 
-userSchema.pre("save", async function(next){
-    this.password = await bcrypt.hash(this.password, 12);
-
-    await next();
+userSchema.pre("save", async function (next) {
+    if(this.isModified("password")) {
+        this.password = await bcrypt.hash(this.password, 12);
+    }
+    
+   next();
 })
 
 //token generation
-userSchema.methods.generateAuthtoken = async function() {
+userSchema.methods.generateAuthtoken = async function () {
     try {
-        let userToken = jwt.sign({_id:this._id, key},{
+        let userToken = jwt.sign({ _id: this._id }, key , {
             expiresIn: "1d"
         });
 
-        this.tokens = this.tokens.concat({token: userToken})
+        this.tokens = this.tokens.concat({ token: userToken });
+        await this.save();
+        return userToken;
     } catch (error) {
-        
+        resizeBy.status(422).json(error);
     }
 }
 
