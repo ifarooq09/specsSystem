@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 
 function Copyright(props) {
   return (
@@ -38,6 +39,8 @@ export default function SignIn() {
     email: "",
     password: ""
   })
+
+  const navigate = useNavigate();
 
   const loginValue = (event) => {
     const {name, value} = event.target;
@@ -82,6 +85,7 @@ export default function SignIn() {
       if(res.status === 200) {
         localStorage.setItem("usersdatatoken", res.result.token)
         setLoginVal({...loginVal, email:"", password:""})
+        navigate("/dashboard")
       }
     }
   };

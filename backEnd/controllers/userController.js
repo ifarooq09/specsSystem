@@ -1,6 +1,7 @@
 import userModel from "../models/userSchema.js";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs"
+import authenticate from "../middleware/authenticate.js";
 
 
 const createUser = async (req, res) => {
@@ -68,8 +69,18 @@ const login = async (req, res) => {
             }
         }
     } catch (error) {
-        
+        res.status(401).json(error)
     }
 }
 
-export { createUser, login };
+//user valid
+const validuser = async (req, res) => {
+    try {
+        const validUserOne = await userModel.findOne({ _id: req.userId});
+        res.status(200).json({ status: 200, validUserOne });
+    } catch (error) {
+        res.status(401).json(error)
+    }
+}
+
+export { createUser, login, validuser };
