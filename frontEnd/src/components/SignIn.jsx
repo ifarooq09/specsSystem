@@ -83,9 +83,9 @@ export default function SignIn() {
       const res = await data.json();
 
       if(res.status === 200) {
-        localStorage.setItem("usersdatatoken", res.result.token)
-        setLoginVal({...loginVal, email:"", password:""})
+        localStorage.setItem("usersdatatoken", res.result.token);
         navigate("/dashboard")
+        setLoginVal({...loginVal, email:"", password:""})
       }
     }
   };
