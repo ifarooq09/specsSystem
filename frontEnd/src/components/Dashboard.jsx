@@ -23,6 +23,8 @@ import Orders from "./Orders";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 function Copyright(props) {
   return (
@@ -99,13 +101,22 @@ const defaultTheme = createTheme({
 
 export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
-  const [loginData, setLoginData] = useState({})
+  const [loginData, setLoginData] = useState({});
+  const history = useNavigate();
 
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
-  const history = useNavigate();
+  //Logout Menu
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const openMenu = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const dashboardValid = async () => {
     let token = localStorage.getItem("usersdatatoken");
@@ -119,7 +130,7 @@ export default function Dashboard() {
     });
 
     const data = await res.json();
-    setLoginData(data)
+    setLoginData(data);
 
     if (data.status == 401 || !data) {
       history("*");
@@ -128,7 +139,7 @@ export default function Dashboard() {
     }
   };
 
-  console.log(loginData)
+  console.log(loginData);
 
   useEffect(() => {
     dashboardValid();
@@ -165,9 +176,32 @@ export default function Dashboard() {
             >
               Dashboard
             </Typography>
-              <Avatar
-                sx={{ width: 50, height: 50, backgroundColor: "#ffffff", fontWeight: "bold", color: "#000000" }}
-              >{loginData?.validUserOne?.firstName?.charAt(0) + "" + loginData?.validUserOne?.lastName?.charAt(0)}</Avatar>
+            <Avatar
+              sx={{
+                width: 50,
+                height: 50,
+                backgroundColor: "#ffffff",
+                fontWeight: "bold",
+                color: "#000000",
+              }}
+              onClick={handleClick}
+            >
+              {loginData?.validUserOne?.firstName?.charAt(0).toUpperCase() +
+                "" +
+                loginData?.validUserOne?.lastName?.charAt(0).toUpperCase()}
+            </Avatar>
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={openMenu}
+              onClose={handleClose}
+              MenuListProps={{
+                "aria-labelledby": "basic-button",
+              }}
+            >
+              <MenuItem onClick={handleClose}>Profile</MenuItem>
+              <MenuItem onClick={handleClose}>Logout</MenuItem>
+            </Menu>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
