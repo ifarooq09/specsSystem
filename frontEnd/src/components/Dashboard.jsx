@@ -130,20 +130,44 @@ export default function Dashboard() {
     });
 
     const data = await res.json();
-    setLoginData(data);
+    
 
     if (data.status == 401 || !data) {
       history("*");
     } else {
+      setLoginData(data);
       history("/dashboard");
     }
   };
 
-  console.log(loginData);
-
   useEffect(() => {
     dashboardValid();
   }, []);
+
+  const logOut = async () => {
+    let token = localStorage.getItem("usersdatatoken");
+
+    const res = await fetch("http://localhost:3000/logout", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+        Accept: "application/json"
+      },
+      credentials: "include"
+    });
+
+    const data = await res.json();
+    
+
+    if (data.status != 200) {
+      console.log("error")
+    } else {
+      localStorage.removeItem("usersdatatoken");
+      setLoginData(false);
+      history("/");
+    }
+  }
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -200,7 +224,10 @@ export default function Dashboard() {
               }}
             >
               <MenuItem onClick={handleClose}>Profile</MenuItem>
-              <MenuItem onClick={handleClose}>Logout</MenuItem>
+              <MenuItem onClick={() => {
+                logOut()
+                handleClose()
+              }}>Logout</MenuItem>
             </Menu>
           </Toolbar>
         </AppBar>

@@ -83,4 +83,22 @@ const validuser = async (req, res) => {
     }
 }
 
-export { createUser, login, validuser };
+//user logout
+const logout = async (req,res) => {
+    try {
+        req.rootUser.tokens = req.rootUser.tokens.filter((curelem) => {
+            return curelem.token !== req.token
+        })
+
+        res.clearCookie("usercookie",{path:"/"});
+
+        req.rootUser.save();
+
+        res.status(200).json({status: 200})
+    } catch (error) {
+        res.status(401).json(error)
+    }
+
+}
+
+export { createUser, login, validuser, logout };
