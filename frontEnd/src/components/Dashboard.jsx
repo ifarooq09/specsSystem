@@ -90,6 +90,7 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
+
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme({
   palette: {
@@ -198,7 +199,7 @@ export default function Dashboard() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard
+              IT Equipment Specification Management Information System
             </Typography>
             <Avatar
               sx={{

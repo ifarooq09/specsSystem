@@ -36,42 +36,46 @@ const createUser = async (req, res) => {
 }
 
 const login = async (req, res) => {
-    const {email, password} = req.body;
+    const { email, password } = req.body;
 
     if (!email || !password) {
-        res.status(422).json({ error: "fill all the details"})
+        return res.status(422).json({ error: "Please provide email and password" });
     }
 
     try {
-        const userValid = await userModel.findOne({email: email});
+        const userValid = await userModel.findOne({ email });
 
-        if(userValid) {
-            const isMatch = await bcrypt.compare(password, userValid.password);
-
-            if(!isMatch) {
-                res.status(422).json({ error: "password is incorrect"});
-            } else {
-                //token generation
-                const token = await userValid.generateAuthtoken();
-
-                //cookie generate
-                res.cookie("usercookie", token, {
-                    expires: new Date(Date.now()+9000000),
-                    httpOnly:true
-                });
-
-                const result = {
-                    userValid,
-                    token
-                }
-
-                res.status(200).json({ status: 200, result })
-            }
+        if (!userValid) {
+            return res.status(422).json({ error: "User not found" });
         }
+
+        const isMatch = await bcrypt.compare(password, userValid.password);
+
+        if (!isMatch) {
+            return res.status(422).json({ error: "Password is incorrect" });
+        }
+
+        // Token generation
+        const token = await userValid.generateAuthToken();
+
+        // Cookie generation
+        res.cookie("usercookie", token, {
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day expiry
+            httpOnly: true
+        });
+
+        const result = {
+            user: userValid,
+            token
+        };
+
+        res.status(200).json({ status: 200, result });
     } catch (error) {
-        res.status(401).json(error)
+        console.error("Login error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-}
+};
+
 
 //user valid
 const validuser = async (req, res) => {
