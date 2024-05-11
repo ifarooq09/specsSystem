@@ -16,10 +16,10 @@ import Paper from "@mui/material/Paper";
 import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import { mainListItems, secondaryListItems } from "./ListItems.jsx";
-import Chart from "./Chart";
-import Deposits from "./Deposits";
-import Orders from "./Orders";
+import SideBarItems from "./SideBarItems.jsx";
+import Chart from "./Chart.jsx";
+import Deposits from "./Deposits.jsx";
+import Orders from "./Orders.jsx";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -90,7 +90,6 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme({
   palette: {
@@ -131,7 +130,6 @@ export default function Dashboard() {
     });
 
     const data = await res.json();
-    
 
     if (data.status == 401 || !data) {
       history("*");
@@ -153,22 +151,21 @@ export default function Dashboard() {
       headers: {
         "Content-Type": "application/json",
         Authorization: token,
-        Accept: "application/json"
+        Accept: "application/json",
       },
-      credentials: "include"
+      credentials: "include",
     });
 
     const data = await res.json();
-    
 
     if (data.status != 200) {
-      console.log("error")
+      console.log("error");
     } else {
       localStorage.removeItem("usersdatatoken");
       setLoginData(false);
-      history("/");
+      history("/dashboard");
     }
-  }
+  };
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -225,10 +222,14 @@ export default function Dashboard() {
               }}
             >
               <MenuItem onClick={handleClose}>Profile</MenuItem>
-              <MenuItem onClick={() => {
-                logOut()
-                handleClose()
-              }}>Logout</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  logOut();
+                  handleClose();
+                }}
+              >
+                Logout
+              </MenuItem>
             </Menu>
           </Toolbar>
         </AppBar>
@@ -247,9 +248,7 @@ export default function Dashboard() {
           </Toolbar>
           <Divider />
           <List component="nav">
-            {mainListItems}
-            <Divider sx={{ my: 1 }} />
-            {secondaryListItems}
+            <SideBarItems />
           </List>
         </Drawer>
         <Box

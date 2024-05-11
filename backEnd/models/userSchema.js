@@ -51,9 +51,9 @@ userSchema.pre("save", async function (next) {
 })
 
 //token generation
-userSchema.methods.generateAuthtoken = async function () {
+userSchema.methods.generateAuthToken = async function () {
     try {
-        let userToken = jwt.sign({ _id: this._id }, key , {
+        let userToken = jwt.sign({ _id: this._id }, key, {
             expiresIn: "1d"
         });
 
@@ -63,7 +63,8 @@ userSchema.methods.generateAuthtoken = async function () {
     } catch (error) {
         resizeBy.status(422).json(error);
     }
-}
+};
+
 
 const userModel = new mongoose.model("users", userSchema);
 

@@ -1,8 +1,7 @@
-import SignIn from "./components/SignIn"
-import CreateUser from "./components/CreateUser"
-import './index.css'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
-import Dashboard from "./components/Dashboard"
+import Dashboard from "./components/pages/Dashboard"
+import SignIn from './components/SignIn'
+import CreateUser from './components/pages/CreateUser'
 import Error from "./components/Error"
 
 function App() {
@@ -19,7 +18,6 @@ function App() {
     </BrowserRouter>
     </>
   )
-
 }
 
 export default App
