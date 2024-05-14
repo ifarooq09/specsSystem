@@ -2,6 +2,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import { Tooltip } from "@mui/material";
 import { FaRegUser } from "react-icons/fa";
 import { SiAwsorganizations } from "react-icons/si";
 import { TbCategoryMinus } from "react-icons/tb";
@@ -23,9 +24,9 @@ const SideBarItems = () => {
       path: "/createUser"
     },
     {
-      text: "Organizations",
+      text: "Directorates",
       icon: <SiAwsorganizations style={{ height: 20, width: 20}}/>,
-      path: "/organizations"
+      path: "/directorates"
     },
     {
       text: "Categories",
@@ -44,7 +45,9 @@ const SideBarItems = () => {
       {menuItems.map((item) => (
         <ListItemButton key={item.text} onClick={() => navigate(item.path)}>
           <div style={{ display: 'flex', alignItems: 'center'}}>
-            <ListItemIcon>{item.icon}</ListItemIcon>
+            <Tooltip title={item.text} placement="right">
+              <ListItemIcon>{item.icon}</ListItemIcon>
+            </Tooltip>
             <ListItemText primary={item.text} />
           </div>
         </ListItemButton>

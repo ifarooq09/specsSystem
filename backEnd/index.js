@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser'
 
 import connectDb from './db/conn.js'
 import userRouter from './routes/userRouter.js'
+import directorateRouter from './routes/directorateRouter.js'
 
 dotenv.config()
 const app = express()
@@ -20,6 +21,7 @@ app.use('*', cors({
 app.use(cookieParser());
 
 app.use(userRouter);
+app.use(directorateRouter);
 // app.get('/', (req, res) => {
 //     res.send({ message: 'Your backend server is running successfully'})
 // })
