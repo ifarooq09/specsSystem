@@ -4,10 +4,11 @@ import { key } from "../key.js";
 
 const authenticate = async (req, res, next) => {
     try {
-        const token = req.headers.authorization;
+        const token = req.headers.authorization?.split(" ")[1];
 
         if (!token) {
-            throw new Error("No token provided");
+            console.error("No token provided");
+            return res.status(401).json({ status: 401, message: "No token provided" });
         }
 
         const decodedToken = jwt.verify(token, key);
@@ -15,12 +16,14 @@ const authenticate = async (req, res, next) => {
         const rootUser = await userModel.findOne({ _id: decodedToken._id });
 
         if (!rootUser) {
-            throw new Error("User not found");
+            console.error("User not found");
+            return res.status(401).json({ status: 401, message: "User not found" });
         }
 
         // Check token expiration
         if (Date.now() >= decodedToken.exp * 1000) {
-            throw new Error("Token expired");
+            console.error("Token expired");
+            return res.status(401).json({ status: 401, message: "Token expired" });
         }
 
         req.token = token;
@@ -29,13 +32,13 @@ const authenticate = async (req, res, next) => {
 
         next();
     } catch (error) {
+        console.error("Authentication error:", error.message);
         if (error.name === 'TokenExpiredError') {
-            res.status(401).json({ status: 401, message: "Token expired" });
+            return res.status(401).json({ status: 401, message: "Token expired" });
         } else {
-            res.status(401).json({ status: 401, message: error.message || "Unauthorized" });
+            return res.status(401).json({ status: 401, message: error.message || "Unauthorized" });
         }
     }
-}
+};
 
-
-export default authenticate
+export default authenticate;
