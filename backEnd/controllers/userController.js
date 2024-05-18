@@ -5,9 +5,9 @@ import authenticate from "../middleware/authenticate.js";
 
 
 const createUser = async (req, res) => {
-    const {firstName, lastName, email, password} = req.body;
+    const {firstName, lastName, email, password, role} = req.body;
 
-    if (!firstName || !lastName || !email || !password) {
+    if (!firstName || !lastName || !email || !password || !role) {
         res.status(422).json({ error: "fill all the details"})
     }
 
@@ -21,7 +21,8 @@ const createUser = async (req, res) => {
                 firstName,
                 lastName,
                 email,
-                password
+                password,
+                role
             })
 
             //password hashing

@@ -100,7 +100,7 @@ export default function Sidebar() {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: token,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -125,7 +125,7 @@ export default function Sidebar() {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: token,
+        Authorization: `Bearer ${token}`,
         Accept: "application/json",
       },
       credentials: "include",

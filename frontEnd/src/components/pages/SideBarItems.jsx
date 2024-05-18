@@ -21,7 +21,7 @@ const SideBarItems = () => {
     {
       text: "Users",
       icon: <FaRegUser style={{ height: 20, width: 20}}/>,
-      path: "/createUser"
+      path: "/users"
     },
     {
       text: "Directorates",

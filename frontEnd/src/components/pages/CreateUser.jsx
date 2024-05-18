@@ -5,7 +5,10 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { Paper } from "@mui/material";
 import { useState } from "react";
-import Sidebar from "../layout/Sidebar";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
 
 export default function SignUp() {
   const [inputVal, setInputVal] = useState({
@@ -13,25 +16,28 @@ export default function SignUp() {
     lastName: "",
     email: "",
     password: "",
+    role: "",
   });
-
-  // console.log(inputVal)
 
   const setVal = (event) => {
     const { name, value } = event.target;
+    setInputVal((prevVal) => ({
+      ...prevVal,
+      [name]: value,
+    }));
+  };
 
-    setInputVal(() => {
-      return {
-        ...inputVal,
-        [name]: value,
-      };
-    });
+  const handleRoleChange = (event) => {
+    setInputVal((prevVal) => ({
+      ...prevVal,
+      role: event.target.value,
+    }));
   };
 
   const addUserData = async (event) => {
     event.preventDefault();
 
-    const { firstName, lastName, email, password } = inputVal;
+    const { firstName, lastName, email, password, role } = inputVal;
 
     if (firstName === "") {
       alert("Enter your First Name");
@@ -40,22 +46,33 @@ export default function SignUp() {
     } else if (email === "") {
       alert("Enter your Email Address");
     } else if (!email.includes("@")) {
-      alert("Enter valid Email");
+      alert("Enter a valid Email");
     } else if (password === "") {
-      alert("Enter password");
+      alert("Enter a password");
     } else if (password.length < 8) {
-      alert("Password must be of atleast 8 characters");
+      alert("Password must be at least 8 characters");
+    } else if (role === "") {
+      alert("Select a role");
     } else {
-      const data = await fetch("http://localhost:3000/createUser", {
+      let token = localStorage.getItem("usersdatatoken");
+
+      if (!token) {
+        alert("No user token found");
+        return;
+      }
+      const data = await fetch("http://localhost:3000/users/createUser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
         },
         body: JSON.stringify({
           firstName,
           lastName,
           email,
           password,
+          role,
         }),
       });
 
@@ -67,13 +84,12 @@ export default function SignUp() {
       lastName: "",
       email: "",
       password: "",
+      role: "",
     });
   };
 
   return (
     <>
-      <Box sx={{ display: "flex" }}>
-        <Sidebar />
         <Box
           component="main"
           sx={{
@@ -84,7 +100,7 @@ export default function SignUp() {
             flexGrow: 1,
             p: 3,
             marginTop: "55px",
-            height: "100vh"
+            height: "100vh",
           }}
         >
           <Paper
@@ -92,7 +108,7 @@ export default function SignUp() {
               p: 2,
               display: "flex",
               flexDirection: "column",
-              height: 'auto'
+              height: "auto",
             }}
           >
             <Typography component="h1" variant="h5">
@@ -155,6 +171,22 @@ export default function SignUp() {
                     onChange={setVal}
                   />
                 </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth required>
+                    <InputLabel id="role-label">Role</InputLabel>
+                    <Select
+                      labelId="role-label"
+                      id="role"
+                      name="role"
+                      value={inputVal.role}
+                      label="Role"
+                      onChange={handleRoleChange}
+                    >
+                      <MenuItem value="admin">Admin</MenuItem>
+                      <MenuItem value="user">User</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
               </Grid>
               <Button
                 type="submit"
@@ -167,7 +199,6 @@ export default function SignUp() {
             </Box>
           </Paper>
         </Box>
-      </Box>
     </>
   );
 }

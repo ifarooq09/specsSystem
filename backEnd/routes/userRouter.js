@@ -5,7 +5,7 @@ import authenticate from '../middleware/authenticate.js'
  
 const userRouter = express.Router()
 
-userRouter.route('/createUser').post(createUser)
+userRouter.route('/users/createUser').post(authenticate, createUser)
 userRouter.route('/login').post(login)
 userRouter.route('/validuser').get(authenticate, validuser)
 userRouter.route('/logout').get(authenticate, logout)

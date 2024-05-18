@@ -8,6 +8,8 @@ import AllCategories from './components/pages/AllCategories';
 import AllSpecifications from './components/pages/AllSpecifications';
 import AddDirectorate from './components/pages/AddDirectorate';
 import DirectorateLayout from './components/layout/DirectorateLayout';
+import AllUsers from './components/pages/AllUsers';
+import UserLayout from './components/layout/UserLayout';
 
 function App() {
   return (
@@ -16,7 +18,10 @@ function App() {
         <Routes>
           <Route path="/" element={<SignIn />} />
           <Route path="/dashboard" element={<Dasboard />} />
-          <Route path="/createUser" element={<CreateUser />} />
+          <Route path="/users" element={<UserLayout />}>
+            <Route index element={<AllUsers />} />
+            <Route path="createUser" element={<CreateUser />} />
+          </Route>
           <Route path="/directorates" element={<DirectorateLayout />} >
             <Route index element={<AllDirectorates />} />
             <Route path="addDirectorate" element={<AddDirectorate />} />

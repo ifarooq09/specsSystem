@@ -1,37 +1,47 @@
-import Sidebar from "../layout/Sidebar"
-import { Box, Paper, Typography } from "@mui/material"
+import { Box, Paper, Typography, Button } from "@mui/material"
+import { useNavigate } from "react-router-dom"
 
 const AllUsers = () => {
+  const navigate = useNavigate()
   return (
     <>
-      <Box sx={{ display: "flex" }}>
-        <Sidebar />
-        <Box
-          component="main"
+      <Box
+        component="main"
+        sx={{
+          backgroundColor: (theme) =>
+            theme.palette.mode === "light"
+              ? theme.palette.grey[100]
+              : theme.palette.grey[900],
+          flexGrow: 1,
+          p: 3,
+          marginTop: "55px",
+          height: "100vh",
+        }}
+      >
+        <Paper
           sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === "light"
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
-            flexGrow: 1,
-            p: 3,
-            marginTop: "55px",
-            height: "100vh"
+            p: 2,
+            display: "flex",
+            flexDirection: "column",
+            height: "auto",
           }}
         >
-          <Paper
+          <Typography component="h1" variant="h5">
+            All Users
+          </Typography>
+          <Button
+            variant="contained"
+            color="success"
             sx={{
-              p: 2,
-              display: "flex",
-              flexDirection: "column",
-              height: 'auto'
+              width: "15%",
+              p: 1,
+              mt: 2,
             }}
+            onClick={() => navigate("createUser")}
           >
-            <Typography component="h1" variant="h5">
-              All Users
-            </Typography>
-          </Paper>
-        </Box>
+            Add User
+          </Button>
+        </Paper>
       </Box>
     </>
   )
