@@ -1,8 +1,59 @@
-import { Box, Paper, Typography, Button } from "@mui/material"
-import { useNavigate } from "react-router-dom"
+import { Box, Paper, Typography, Button } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AllUsers = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    let token = localStorage.getItem("usersdatatoken");
+
+    if (!token) {
+      alert("No user token found");
+      return;
+    }
+
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/users", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+        
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        setUsers(data);
+      } catch (error) {
+        console.error("Error fetching users:", error.message);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  const columns = [
+    { field: 'id', headerName: 'ID', flex: 1 },
+    { field: 'firstName', headerName: 'First name', flex: 1 },
+    { field: 'lastName', headerName: 'Last name', flex: 1 },
+    { field: 'email', headerName: 'Email', flex: 2 },
+    { field: 'role', headerName: 'Role', flex: 1 },
+  ];
+
+  // Ensure users is not undefined or null before mapping over it
+  const rows = users ? users.map((user, index) => ({
+    id: index + 1,
+    ...user,
+  })) : [];
+
   return (
     <>
       <Box
@@ -41,10 +92,16 @@ const AllUsers = () => {
           >
             Add User
           </Button>
+          <div style={{ height: 400, width: '100%', marginTop: 20 }}>
+            <DataGrid
+              columns={columns}
+              rows={rows}
+            />
+          </div>
         </Paper>
       </Box>
     </>
-  )
-}
+  );
+};
 
-export default AllUsers
+export default AllUsers;

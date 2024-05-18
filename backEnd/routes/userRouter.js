@@ -1,10 +1,11 @@
 import express from 'express'
 
-import { createUser, login, validuser, logout } from '../controllers/userController.js'
+import { createUser, login, validuser, logout, alluser } from '../controllers/userController.js'
 import authenticate from '../middleware/authenticate.js'
  
 const userRouter = express.Router()
 
+userRouter.route('/users').get(authenticate, alluser)
 userRouter.route('/users/createUser').post(authenticate, createUser)
 userRouter.route('/login').post(login)
 userRouter.route('/validuser').get(authenticate, validuser)

@@ -88,6 +88,16 @@ const validuser = async (req, res) => {
     }
 }
 
+const alluser = async (req,res) => {
+    try {
+        const users = await userModel.find({});
+        res.status(200).json(users);
+    } catch (error) {
+        console.error('Error fetching users:', error.message);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
 //user logout
 const logout = async (req,res) => {
     try {
@@ -106,4 +116,4 @@ const logout = async (req,res) => {
 
 }
 
-export { createUser, login, validuser, logout };
+export { createUser, login, validuser, logout, alluser };

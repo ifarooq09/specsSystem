@@ -29,4 +29,20 @@ const createDirectorate = async (req, res) => {
   }
 };
 
-export { createDirectorate };
+const alldirectorate = async (req,res) => {
+  try {
+    const directorates = await directorateModel.find({})
+      .populate({
+        path: "user",
+        select: "firstName lastName",
+      })
+      .exec();
+
+    res.status(200).json(directorates);
+  } catch (error) {
+    console.error("Error fetching directorates:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export { createDirectorate, alldirectorate };
