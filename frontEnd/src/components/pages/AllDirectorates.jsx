@@ -45,12 +45,14 @@ const AllDirectorates = () => {
   const columns = [
     { field: 'id', headerName: 'ID', flex: 1 },
     { field: 'name', headerName: 'Directorate Name', flex: 1 },
+    { field: 'user', headerName: "Created By", flex: 1}
   ];
 
   // Ensure users is not undefined or null before mapping over it
   const rows = directorates ? directorates.map((directorate, index) => ({
     id: index + 1,
-    ...directorate,
+    name: directorate.name,
+    user: `${directorate.user.firstName} ${directorate.user.lastName}`
   })) : [];
 
   return (
