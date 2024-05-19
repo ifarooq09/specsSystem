@@ -1,11 +1,15 @@
 import { Box, Paper, Typography, Button } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, gridClasses } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
+import { grey } from "@mui/material/colors";
+import UserActions from "./actions/UserActions";
 
 const AllUsers = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
+  const [rowId, setRowId] = useState(null)
 
   useEffect(() => {
     let token = localStorage.getItem("usersdatatoken");
@@ -25,7 +29,7 @@ const AllUsers = () => {
             Accept: "application/json",
           },
         });
-        
+
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
@@ -41,18 +45,51 @@ const AllUsers = () => {
   }, []);
 
   const columns = [
-    { field: 'id', headerName: 'ID', flex: 1 },
-    { field: 'firstName', headerName: 'First name', flex: 1 },
-    { field: 'lastName', headerName: 'Last name', flex: 1 },
-    { field: 'email', headerName: 'Email', flex: 2 },
-    { field: 'role', headerName: 'Role', flex: 1 },
+    { field: "id", headerName: "ID", flex: 1 },
+    { field: "firstName", headerName: "First name", flex: 1 },
+    { field: "lastName", headerName: "Last name", flex: 1 },
+    { field: "email", headerName: "Email", flex: 2 },
+    {
+      field: "role",
+      headerName: "Role",
+      flex: 1,
+      type: "singleSelect",
+      valueOptions: ["admin", "user"],
+      editable: true,
+    },
+    {
+      field: "active",
+      headerName: "Status",
+      flex: 1,
+      type: "boolean",
+      editable: true,
+    },
+    {
+      field: "createdAt",
+      headerName: "Created At",
+      flex: 1,
+      renderCell: (params) => {
+        return format(new Date(params.value), "yyyy-MM-dd HH:MM:SS");
+      },
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 1,
+      renderCell: (params) => {
+        return <UserActions {...{ params, rowId, setRowId}} />
+      }
+
+    }
   ];
 
   // Ensure users is not undefined or null before mapping over it
-  const rows = users ? users.map((user, index) => ({
-    id: index + 1,
-    ...user,
-  })) : [];
+  const rows = users
+    ? users.map((user, index) => ({
+        id: index + 1,
+        ...user,
+      }))
+    : [];
 
   return (
     <>
@@ -92,10 +129,17 @@ const AllUsers = () => {
           >
             Add User
           </Button>
-          <div style={{ height: 400, width: '100%', marginTop: 20 }}>
-            <DataGrid
-              columns={columns}
-              rows={rows}
+          <div style={{ height: 400, width: "100%", marginTop: 20 }}>
+            <DataGrid columns={columns} rows={rows} getRowSpacing={(params) => ({
+              top: params.isFirstVisible ? 0 : 5,
+              bottom: params.isLastVisible ? 0 : 5, 
+            })}
+            sx={{
+              [`& .${gridClasses.row}`]: {
+                bgcolor: (theme) => 
+                  theme.palette.mode === 'light' ? grey[200] : grey[700]
+              }
+            }}
             />
           </div>
         </Paper>

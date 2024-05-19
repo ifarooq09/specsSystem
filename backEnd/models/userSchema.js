@@ -3,6 +3,7 @@ import validator from "validator";
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken";
 import { key } from "../key.js";
+import { Timestamp } from "mongodb";
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -34,6 +35,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    active: {
+        type: Boolean,
+        default: true
+    },
     tokens: [
         {
             token: {
@@ -42,6 +47,9 @@ const userSchema = new mongoose.Schema({
             }
         }
     ]
+},
+{
+    timestamps: true
 })
 
 //hash password

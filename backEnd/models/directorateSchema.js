@@ -11,6 +11,9 @@ const directorateSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
     }
+},
+{
+    timestamps: true
 })
 
 const directorateModel = new mongoose.model("directorates", directorateSchema)
