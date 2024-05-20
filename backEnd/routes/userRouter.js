@@ -1,6 +1,6 @@
 import express from 'express'
 
-import { createUser, login, validuser, logout, alluser } from '../controllers/userController.js'
+import { createUser, login, validuser, logout, alluser, updateUser } from '../controllers/userController.js'
 import authenticate from '../middleware/authenticate.js'
  
 const userRouter = express.Router()
@@ -10,5 +10,6 @@ userRouter.route('/users/createUser').post(authenticate, createUser)
 userRouter.route('/login').post(login)
 userRouter.route('/validuser').get(authenticate, validuser)
 userRouter.route('/logout').get(authenticate, logout)
+userRouter.route('/users/:userId').put(authenticate, updateUser);
 
 export default userRouter

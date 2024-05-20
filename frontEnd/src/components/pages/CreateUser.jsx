@@ -9,8 +9,10 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
+  const navigate = useNavigate();
   const [inputVal, setInputVal] = useState({
     firstName: "",
     lastName: "",
@@ -86,6 +88,8 @@ export default function SignUp() {
       password: "",
       role: "",
     });
+
+    navigate("/users")
   };
 
   return (

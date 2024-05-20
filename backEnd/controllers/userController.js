@@ -5,17 +5,17 @@ import authenticate from "../middleware/authenticate.js";
 
 
 const createUser = async (req, res) => {
-    const {firstName, lastName, email, password, role} = req.body;
+    const { firstName, lastName, email, password, role } = req.body;
 
     if (!firstName || !lastName || !email || !password || !role) {
-        res.status(422).json({ error: "fill all the details"})
+        res.status(422).json({ error: "fill all the details" })
     }
 
     try {
-        const preUser = await userModel.findOne({ email: email});
+        const preUser = await userModel.findOne({ email: email });
 
-        if(preUser) {
-            res.status(422).json({ error: "This Email Already Exist"})
+        if (preUser) {
+            res.status(422).json({ error: "This Email Already Exist" })
         } else {
             const finalUser = new userModel({
                 firstName,
@@ -27,7 +27,7 @@ const createUser = async (req, res) => {
 
             //password hashing
             await finalUser.save();
-            return res.status(200).json({ message: "User created successfully" });         
+            return res.status(200).json({ message: "User created successfully" });
         }
 
     } catch (error) {
@@ -56,6 +56,13 @@ const login = async (req, res) => {
             return res.status(422).json({ error: "Password is incorrect" });
         }
 
+        const { active } = userValid;
+
+        if (!active) {
+
+            return res.status(400).json({ success: false, message: "This account has been suspended! Try to contact the admin" })
+
+        }
         // Token generation
         const token = await userValid.generateAuthToken();
 
@@ -81,14 +88,14 @@ const login = async (req, res) => {
 //user valid
 const validuser = async (req, res) => {
     try {
-        const validUserOne = await userModel.findOne({ _id: req.userId});
+        const validUserOne = await userModel.findOne({ _id: req.userId });
         res.status(200).json({ status: 200, validUserOne });
     } catch (error) {
         res.status(401).json(error)
     }
 }
 
-const alluser = async (req,res) => {
+const alluser = async (req, res) => {
     try {
         const users = await userModel.find({});
         res.status(200).json(users);
@@ -98,22 +105,29 @@ const alluser = async (req,res) => {
     }
 }
 
+const updateUser = async (req, res) => {
+    try {
+        const { role, active } = req.body;
+        await userModel.findByIdAndUpdate(req.params.userId, { role, active });
+        res.status(200).json({ success: true, result: { _id: req.params.userId } });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
 //user logout
-const logout = async (req,res) => {
+const logout = async (req, res) => {
     try {
         req.rootUser.tokens = req.rootUser.tokens.filter((curelem) => {
             return curelem.token !== req.token
         })
-
-        res.clearCookie("usercookie",{path:"/"});
-
+        res.clearCookie("usercookie", { path: "/" });
         req.rootUser.save();
-
-        res.status(200).json({status: 200})
+        res.status(200).json({ status: 200 })
     } catch (error) {
         res.status(401).json(error)
     }
-
 }
 
-export { createUser, login, validuser, logout, alluser };
+export { createUser, login, validuser, logout, alluser, updateUser };

@@ -9,7 +9,7 @@ import UserActions from "./actions/UserActions";
 const AllUsers = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
-  const [rowId, setRowId] = useState(null)
+  const [rowId, setRowId] = useState(null);
 
   useEffect(() => {
     let token = localStorage.getItem("usersdatatoken");
@@ -44,6 +44,36 @@ const AllUsers = () => {
     fetchUsers();
   }, []);
 
+  const handleSave = async (row) => {
+    let token = localStorage.getItem("usersdatatoken");
+
+    try {
+      const res = await fetch(`http://localhost:3000/users/${row._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          role: row.role,
+          active: row.active,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      if (data.success) {
+        const updatedUsers = users.map((user) => (user._id === data.result._id ? { ...user, role: row.role, active: row.active } : user));
+        setUsers(updatedUsers);
+      }
+    } catch (error) {
+      console.error("Error updating user:", error.message);
+    }
+  };
+
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "firstName", headerName: "First name", flex: 1 },
@@ -77,13 +107,11 @@ const AllUsers = () => {
       headerName: "Actions",
       flex: 1,
       renderCell: (params) => {
-        return <UserActions {...{ params, rowId, setRowId}} />
-      }
-
-    }
+        return <UserActions {...{ params, rowId, setRowId, onSave: handleSave }} />;
+      },
+    },
   ];
 
-  // Ensure users is not undefined or null before mapping over it
   const rows = users
     ? users.map((user, index) => ({
         id: index + 1,
@@ -130,16 +158,24 @@ const AllUsers = () => {
             Add User
           </Button>
           <div style={{ height: 400, width: "100%", marginTop: 20 }}>
-            <DataGrid columns={columns} rows={rows} getRowSpacing={(params) => ({
-              top: params.isFirstVisible ? 0 : 5,
-              bottom: params.isLastVisible ? 0 : 5, 
-            })}
-            sx={{
-              [`& .${gridClasses.row}`]: {
-                bgcolor: (theme) => 
-                  theme.palette.mode === 'light' ? grey[200] : grey[700]
-              }
-            }}
+            <DataGrid
+              columns={columns}
+              rows={rows}
+              getRowSpacing={(params) => ({
+                top: params.isFirstVisible ? 0 : 5,
+                bottom: params.isLastVisible ? 0 : 5,
+              })}
+              sx={{
+                [`& .${gridClasses.row}`]: {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "light" ? grey[200] : grey[700],
+                },
+              }}
+              onCellEditStart={(params) => setRowId(params.id)}
+              processRowUpdate={(newRow) => {
+                handleSave(newRow);
+                return newRow;
+              }}
             />
           </div>
         </Paper>
