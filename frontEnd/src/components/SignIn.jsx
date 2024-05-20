@@ -88,12 +88,6 @@ export default function SignIn() {
           navigate("/dashboard");
           setLoginVal({ email: "", password: "" });
           setErrorMsg(""); // Clear error message on successful login
-        } else if (response.status === 420) {
-          setErrorMsg("Please provide email and password");
-        } else if (response.status === 421) {
-          setErrorMsg("User not found");
-        } else if (response.status === 422) {
-          setErrorMsg("Password is incorrect");
         } else if (response.status === 423) {
           setErrorMsg("This account has been suspended! Try to contact the admin");
         } else {
