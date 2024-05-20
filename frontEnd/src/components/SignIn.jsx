@@ -6,6 +6,7 @@ import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import { Alert } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
@@ -39,6 +40,7 @@ export default function SignIn() {
     email: "",
     password: ""
   })
+  const [errorMsg, setErrorMsg] = useState('');
 
   const navigate = useNavigate();
 
@@ -59,39 +61,58 @@ export default function SignIn() {
     const {email, password} = loginVal;
 
    if (email === "") {
-      alert("Enter your Email Address");
+      setErrorMsg("Enter your Email Address");
     } else if (!email.includes("@")) {
-      alert("Enter valid Email");
+      setErrorMsg("Enter valid Email");
     } else if (password === "") {
-      alert("Enter password");
+      setErrorMsg("Enter password");
     } else if (password.length < 8) {
-      alert("Password must be of atleast 8 characters");
+      setErrorMsg("Password must be of atleast 8 characters");
     } else {
-      // console.log("Loged Successfully")
+      try {
+        const response = await fetch("http://localhost:3000/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        });
 
-      const data = await fetch("http://localhost:3000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+        const res = await response.json();
 
-      const res = await data.json();
-
-      if(res.status === 200) {
-        localStorage.setItem("usersdatatoken", res.result.token);
-        navigate("/dashboard")
-        setLoginVal({...loginVal, email:"", password:""})
+        if (response.status === 200) {
+          localStorage.setItem("usersdatatoken", res.result.token);
+          navigate("/dashboard");
+          setLoginVal({ email: "", password: "" });
+          setErrorMsg(""); // Clear error message on successful login
+        } else if (response.status === 420) {
+          setErrorMsg("Please provide email and password");
+        } else if (response.status === 421) {
+          setErrorMsg("User not found");
+        } else if (response.status === 422) {
+          setErrorMsg("Password is incorrect");
+        } else if (response.status === 423) {
+          setErrorMsg("This account has been suspended! Try to contact the admin");
+        } else {
+          setErrorMsg("Login failed. Please try again.");
+        }
+      } catch (error) {
+        setErrorMsg("An error occurred. Please try again later.");
+        console.error("Login error:", error);
       }
     }
   };
 
   return (
     <ThemeProvider theme={defaultTheme}>
+      {errorMsg && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {errorMsg}
+        </Alert>
+      )}
       <Container component="main" maxWidth="xs" sx={{ backgroundColor: '#f2f3f4', borderRadius: 3, border: '2px solid green', marginTop: 10, marginBottom: 5}}>
         <CssBaseline />
         <Box

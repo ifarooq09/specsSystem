@@ -1,6 +1,6 @@
 import { Box, CircularProgress, Fab } from "@mui/material";
 import { green } from "@mui/material/colors";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Save } from "@mui/icons-material";
 
 const UserActions = ({ params, rowId, setRowId, onSave }) => {
@@ -19,6 +19,12 @@ const UserActions = ({ params, rowId, setRowId, onSave }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if(rowId === params.id && success) {
+      setSuccess(false)
+    }
+  }, [rowId])
 
   return (
     <Box

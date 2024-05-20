@@ -52,7 +52,7 @@ const AllDirectorates = () => {
   const rows = directorates ? directorates.map((directorate, index) => ({
     id: index + 1,
     name: directorate.name,
-    user: `${directorate.user.firstName} ${directorate.user.lastName}`
+    user: `${directorate?.user?.firstName} ${directorate?.user?.lastName}`
   })) : [];
 
   return (
