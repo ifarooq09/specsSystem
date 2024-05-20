@@ -103,6 +103,14 @@ const AllUsers = () => {
       },
     },
     {
+      field: "updatedAt",
+      headerName: "Updated At",
+      flex: 1,
+      renderCell: (params) => {
+        return format(new Date(params.value), "yyyy-MM-dd HH:MM:SS");
+      },
+    },
+    {
       field: "actions",
       headerName: "Actions",
       flex: 1,

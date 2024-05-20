@@ -7,7 +7,11 @@ const directorateSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
-    user: {
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users'
+    },
+    updatedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
     }
