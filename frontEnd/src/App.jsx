@@ -10,6 +10,8 @@ import AddDirectorate from './components/pages/AddDirectorate';
 import DirectorateLayout from './components/layout/DirectorateLayout';
 import AllUsers from './components/pages/AllUsers';
 import UserLayout from './components/layout/UserLayout';
+import CategoryLayout from './components/layout/CategoryLayout';
+import AddCategory from './components/pages/AddCategory';
 
 function App() {
   return (
@@ -26,7 +28,10 @@ function App() {
             <Route index element={<AllDirectorates />} />
             <Route path="addDirectorate" element={<AddDirectorate />} />
           </Route>
-          <Route path="/categories" element={<AllCategories />} />
+          <Route path="/categories" element={<CategoryLayout />} >
+            <Route index element={ <AllCategories /> } />
+            <Route path="addCategory" element={<AddCategory />} />
+          </Route>
           <Route path="/specifications" element={<AllSpecifications />} />
           <Route path="*" element={<Error />} />
         </Routes>

@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import connectDb from './db/conn.js';
 import userRouter from './routes/userRouter.js';
 import directorateRouter from './routes/directorateRouter.js';
+import categoryRouter from './routes/categoryRouter.js';
 
 dotenv.config();
 const app = express();
@@ -35,6 +36,7 @@ app.use((req, res, next) => {
 
 app.use(userRouter);
 app.use(directorateRouter);
+app.use(categoryRouter);
 
 const startServer = async () => {
   try {

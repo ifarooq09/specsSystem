@@ -177,7 +177,7 @@ const AllDirectorates = () => {
           >
             Add Directorate
           </Button>
-          <div style={{ height: 450, width: "100%", marginTop: 20 }}>
+          <div style={{ height: 600, width: "100%", marginTop: 20 }}>
             <DataGrid
               columns={columns}
               rows={rows}

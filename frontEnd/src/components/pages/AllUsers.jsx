@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { grey } from "@mui/material/colors";
-import UserActions from "./actions/UserActions";
+import UserActions from "./UserActions";
 
 const AllUsers = () => {
   const navigate = useNavigate();
