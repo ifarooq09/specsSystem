@@ -2,7 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Box, Paper, Typography, Fab } from "@mui/material";
 import { Button } from "@mui/material";
-import { DataGrid, gridClasses } from "@mui/x-data-grid";
+import { DataGrid, GridToolbarContainer,
+  GridToolbarExport, gridClasses } from "@mui/x-data-grid";
 import { grey } from "@mui/material/colors";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -197,6 +198,22 @@ const AllCategories = () => {
             <DataGrid
               columns={columns}
               rows={rows}
+              slots={{
+                toolbar: () => {
+                  return (
+                    <GridToolbarContainer sx={{
+                      justifyContent: 'flex-end'
+                    }}>
+                      <GridToolbarExport 
+                        csvOptions={{
+                          fileName: 'categories',
+                          utf8WithBom: true,
+                        }}
+                      />
+                    </GridToolbarContainer>
+                  );
+                },
+              }}
               getRowSpacing={(params) => ({
                 top: params.isFirstVisible ? 0 : 5,
                 bottom: params.isLastVisible ? 0 : 5,

@@ -2,10 +2,16 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Box, Paper, Typography, Fab } from "@mui/material";
 import { Button } from "@mui/material";
-import { DataGrid, gridClasses } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridToolbarContainer,
+  GridToolbarExport,
+  gridClasses,
+} from "@mui/x-data-grid";
 import { grey } from "@mui/material/colors";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 
 const AllDirectorates = () => {
   const navigate = useNavigate();
@@ -98,13 +104,13 @@ const AllDirectorates = () => {
 
   const handleCellEditCommit = async (params) => {
     const { id, field, value } = params;
-    if (field === 'name') {
+    if (field === "name") {
       handleUpdate(id, value);
     }
   };
 
   const columns = [
-    { field: "id", headerName: "ID", flex: 1,},
+    { field: "id", headerName: "ID", flex: 1 },
     { field: "name", headerName: "Directorate Name", flex: 1, editable: true },
     { field: "createdBy", headerName: "Created By", flex: 1 },
     { field: "createdAt", headerName: "Created At", flex: 1 },
@@ -116,20 +122,29 @@ const AllDirectorates = () => {
       flex: 1,
       renderCell: (params) => (
         <>
-          <Fab size="small" color="primary" onClick={() => handleUpdate(params.row._id, params.row.name)}>
+          <Fab
+            size="small"
+            color="primary"
+            onClick={() => handleUpdate(params.row._id, params.row.name)}
+          >
             <EditIcon />
           </Fab>
-          <Fab size="small" color="secondary" sx={{ ml: 2 }} onClick={() => handleDelete(params.row._id)}>
+          <Fab
+            size="small"
+            color="secondary"
+            sx={{ ml: 2 }}
+            onClick={() => handleDelete(params.row._id)}
+          >
             <DeleteIcon />
           </Fab>
         </>
       ),
-    }
+    },
   ];
 
   const rows = directorates
     ? directorates.map((directorate, index) => ({
-        id: index + 1,  // Use the actual _id from the database
+        id: index + 1, // Use the actual _id from the database
         _id: directorate._id,
         name: directorate.name,
         createdBy: `${directorate?.createdBy?.firstName} ${directorate?.createdBy?.lastName}`,
@@ -181,6 +196,22 @@ const AllDirectorates = () => {
             <DataGrid
               columns={columns}
               rows={rows}
+              slots={{
+                toolbar: () => {
+                  return (
+                    <GridToolbarContainer sx={{
+                      justifyContent: 'flex-end'
+                    }}>
+                      <GridToolbarExport 
+                        csvOptions={{
+                          fileName: 'directorates',
+                          utf8WithBom: true,
+                        }}
+                      />
+                    </GridToolbarContainer>
+                  );
+                },
+              }}
               getRowSpacing={(params) => ({
                 top: params.isFirstVisible ? 0 : 5,
                 bottom: params.isLastVisible ? 0 : 5,
