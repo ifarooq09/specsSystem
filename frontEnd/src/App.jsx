@@ -12,6 +12,8 @@ import AllUsers from './components/pages/AllUsers';
 import UserLayout from './components/layout/UserLayout';
 import CategoryLayout from './components/layout/CategoryLayout';
 import AddCategory from './components/pages/AddCategory';
+import SpecificationLayout from './components/layout/SpecificationLayout';
+import AddSpecification from './components/pages/AddSpecification';
 
 function App() {
   return (
@@ -32,7 +34,10 @@ function App() {
             <Route index element={ <AllCategories /> } />
             <Route path="addCategory" element={<AddCategory />} />
           </Route>
-          <Route path="/specifications" element={<AllSpecifications />} />
+          <Route path="/specifications" element={<SpecificationLayout />}>
+            <Route index element={ <AllSpecifications /> } />
+            <Route path="addSpecification" element={<AddSpecification />} />
+          </Route>
           <Route path="*" element={<Error />} />
         </Routes>
       </BrowserRouter>

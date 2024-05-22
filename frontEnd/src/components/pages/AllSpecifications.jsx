@@ -1,11 +1,10 @@
-import Sidebar from "../layout/Sidebar"
-import { Box, Paper, Typography } from "@mui/material"
+import { Box, Paper, Typography, Button } from "@mui/material"
+import { useNavigate } from "react-router-dom"
 
 const AllSpecifications = () => {
+  const navigate = useNavigate()
   return (
     <>
-    <Box sx={{ display: "flex" }}>
-      <Sidebar />
       <Box
         component="main"
         sx={{
@@ -30,9 +29,20 @@ const AllSpecifications = () => {
           <Typography component="h1" variant="h5">
             All Specifications
           </Typography>
+          <Button
+            variant="contained"
+            color="success"
+            sx={{
+              width: "15%",
+              p: 1,
+              mt: 2,
+            }}
+            onClick={() => navigate("addSpecification")}
+          >
+            Add Specification
+          </Button>
         </Paper>
       </Box>
-    </Box>
   </>
   )
 }
