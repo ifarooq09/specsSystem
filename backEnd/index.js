@@ -6,6 +6,9 @@ import connectDb from './db/conn.js';
 import userRouter from './routes/userRouter.js';
 import directorateRouter from './routes/directorateRouter.js';
 import categoryRouter from './routes/categoryRouter.js';
+import specRouter from './routes/specRouter.js';
+import path from 'path';
+import { fileURLToPath } from 'url'; // To convert import.meta.url to a file path
 
 dotenv.config();
 const app = express();
@@ -34,16 +37,23 @@ app.use((req, res, next) => {
   next();
 });
 
+// Get the directory name of the current module
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use(userRouter);
 app.use(directorateRouter);
 app.use(categoryRouter);
+app.use(specRouter);
 
 const startServer = async () => {
   try {
     await connectDb(process.env.MONGODB_URL);
     app.listen(port, () => console.log(`Server started on port ${port}`));
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 

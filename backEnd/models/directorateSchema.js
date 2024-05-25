@@ -1,12 +1,15 @@
 import mongoose from "mongoose";
 
-
 const directorateSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
         trim: true,
     },
+    specifications: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'specifications'
+    }],
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
@@ -15,11 +18,10 @@ const directorateSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
     }
-},
-{
+}, {
     timestamps: true
-})
+});
 
-const directorateModel = new mongoose.model("directorates", directorateSchema)
+const directorateModel = mongoose.model("directorates", directorateSchema);
 
-export default directorateModel
+export default directorateModel;

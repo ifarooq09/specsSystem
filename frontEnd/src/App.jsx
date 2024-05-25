@@ -14,6 +14,7 @@ import CategoryLayout from './components/layout/CategoryLayout';
 import AddCategory from './components/pages/AddCategory';
 import SpecificationLayout from './components/layout/SpecificationLayout';
 import AddSpecification from './components/pages/AddSpecification';
+import SpecDetails from './components/pages/SpecDetails';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path="/specifications" element={<SpecificationLayout />}>
             <Route index element={ <AllSpecifications /> } />
             <Route path="addSpecification" element={<AddSpecification />} />
+            <Route path="/specifications/:id" element={<SpecDetails />} />
           </Route>
           <Route path="*" element={<Error />} />
         </Routes>
