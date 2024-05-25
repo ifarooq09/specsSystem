@@ -18,11 +18,8 @@ const SpecDetails = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`http://localhost:3000/specifications/${id}`, {
-          method: "GET",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
-            Accept: "application/json",
           },
         });
         setSpecDetails(response.data);
@@ -38,17 +35,41 @@ const SpecDetails = () => {
     return <Typography>Loading...</Typography>;
   }
 
-  const columns = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'category', headerName: 'Category', width: 150 },
-    { field: 'description', headerName: 'Description', width: 300 },
-  ];
+  // Format createdBy and updatedBy fields
+  const createdBy = `${specDetails.createdBy.firstName} ${specDetails.createdBy.lastName}`;
+  const updatedBy = `${specDetails.updatedBy.firstName} ${specDetails.updatedBy.lastName}`;
 
+  // Create rows array with data for each specification
   const rows = specDetails.specifications.map((spec, index) => ({
     id: index + 1,
-    category: spec.categoryName,
-    description: spec.description,
+    _id: specDetails._id,
+    "directorate.name": specDetails.directorate.name,
+    "specifications.category.categoryName": spec.category.categoryName,
+    "specifications.description": spec.description,
+    createdBy: createdBy,
+    createdAt: new Date(specDetails.createdAt).toLocaleString(),
+    updatedBy: updatedBy,
+    updatedAt: new Date(specDetails.updatedAt).toLocaleString(),
   }));
+
+  const columns = [
+    { field: "id", headerName: "ID", width: 150 },
+    { field: "directorate.name", headerName: "Directorate", width: 200 },
+    {
+      field: "specifications.category.categoryName",
+      headerName: "Category",
+      width: 150,
+    },
+    {
+      field: "specifications.description",
+      headerName: "Description",
+      width: 300,
+    },
+    { field: "createdBy", headerName: "Created By", width: 200 },
+    { field: "createdAt", headerName: "Created At", width: 180 },
+    { field: "updatedBy", headerName: "Updated By", width: 200 },
+    { field: "updatedAt", headerName: "Updated At", width: 180 },
+  ];
 
   return (
     <Box
@@ -67,8 +88,13 @@ const SpecDetails = () => {
       <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
         Specification Details for {specDetails.uniqueNumber}
       </Typography>
-      <Box sx={{ height: 400, width: '100%' }}>
-        <DataGrid rows={rows} columns={columns} pageSize={5} rowsPerPageOptions={[5]} />
+      <Box sx={{ height: 400, width: "100%" }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          pageSize={specDetails.specifications.length} // Set pageSize to show all specifications
+          rowsPerPageOptions={[specDetails.specifications.length]}
+        />
       </Box>
     </Box>
   );

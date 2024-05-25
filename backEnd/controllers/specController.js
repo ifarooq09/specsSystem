@@ -49,10 +49,33 @@ const allSpecifications = async (req, res) => {
 
 const getSpecs = async (req, res) => {
     try {
-        const specification = await specModel.findById(req.params.id).populate('directorate').populate('specifications.category').exec();
+        const specification = await specModel.findById(req.params.id)
+          .populate({
+            path: 'directorate',
+            model: 'directorates',
+            select: 'name',
+          })
+          .populate({
+            path: 'specifications.category',
+            model: 'categories',
+            select: 'categoryName',
+          })
+          .populate({
+            path: 'createdBy',
+            model: 'users',
+            select: 'firstName lastName',
+          })
+          .populate({
+            path: 'updatedBy',
+            model: 'users',
+            select: 'firstName lastName',
+          })
+          .exec();
+    
         if (!specification) {
           return res.status(404).json({ message: 'Specification not found' });
         }
+    
         res.status(200).json(specification);
       } catch (error) {
         res.status(500).json({ message: error.message });
