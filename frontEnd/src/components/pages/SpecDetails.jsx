@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Paper } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { Fab } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const SpecDetails = () => {
   const { id } = useParams();
@@ -17,11 +20,14 @@ const SpecDetails = () => {
     }
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/specifications/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `http://localhost:3000/specifications/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setSpecDetails(response.data);
       } catch (error) {
         console.error(error);
@@ -30,6 +36,14 @@ const SpecDetails = () => {
 
     fetchData();
   }, [id]);
+
+  const handleUpdate = async (id, newData) => {
+    console.log(id + newData)
+  }
+
+  const handleDelete = async (id) => {
+    console.log(id)
+  }
 
   if (!specDetails) {
     return <Typography>Loading...</Typography>;
@@ -69,34 +83,71 @@ const SpecDetails = () => {
     { field: "createdAt", headerName: "Created At", width: 180 },
     { field: "updatedBy", headerName: "Updated By", width: 200 },
     { field: "updatedAt", headerName: "Updated At", width: 180 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 1,
+      renderCell: (params) => (
+        <>
+          <Fab
+            size="small"
+            color="primary"
+            onClick={() =>
+              handleUpdate(params.row._id, params.row.categoryName)
+            }
+          >
+            <EditIcon />
+          </Fab>
+          <Fab
+            size="small"
+            color="secondary"
+            sx={{ ml: 2 }}
+            onClick={() => handleDelete(params.row._id)}
+          >
+            <DeleteIcon />
+          </Fab>
+        </>
+      ),
+    },
   ];
 
   return (
-    <Box
-      component="main"
-      sx={{
-        backgroundColor: (theme) =>
-          theme.palette.mode === "light"
-            ? theme.palette.grey[100]
-            : theme.palette.grey[900],
-        flexGrow: 1,
-        p: 3,
-        marginTop: "55px",
-        height: "100vh",
-      }}
-    >
-      <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-        Specification Details for {specDetails.uniqueNumber}
-      </Typography>
-      <Box sx={{ height: 400, width: "100%" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={specDetails.specifications.length} // Set pageSize to show all specifications
-          rowsPerPageOptions={[specDetails.specifications.length]}
-        />
+    <>
+      <Box
+        component="main"
+        sx={{
+          backgroundColor: (theme) =>
+            theme.palette.mode === "light"
+              ? theme.palette.grey[100]
+              : theme.palette.grey[900],
+          flexGrow: 1,
+          p: 3,
+          marginTop: "55px",
+          height: "100vh",
+        }}
+      >
+        <Paper
+          sx={{
+            p: 2,
+            display: "flex",
+            flexDirection: "column",
+            height: "auto",
+          }}
+        >
+          <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
+            Specification Details for {specDetails.uniqueNumber}
+          </Typography>
+          <Box sx={{ height: 400, width: "100%" }}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              pageSize={specDetails.specifications.length} // Set pageSize to show all specifications
+              rowsPerPageOptions={[specDetails.specifications.length]}
+            />
+          </Box>
+        </Paper>
       </Box>
-    </Box>
+    </>
   );
 };
 
