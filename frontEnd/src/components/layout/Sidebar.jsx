@@ -1,4 +1,3 @@
-import * as React from "react";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import MuiDrawer from "@mui/material/Drawer";
@@ -9,13 +8,12 @@ import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import { Avatar } from "@mui/material";
+import { Avatar, Grid } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import SideBarItems from "../pages/SideBarItems.jsx";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
@@ -65,7 +63,6 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme({
   palette: {
     primary: {
@@ -75,7 +72,7 @@ const defaultTheme = createTheme({
 });
 
 export default function Sidebar() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const [loginData, setLoginData] = useState({});
   const history = useNavigate();
 
@@ -83,8 +80,7 @@ export default function Sidebar() {
     setOpen(!open);
   };
 
-  //Logout Menu
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -110,7 +106,6 @@ export default function Sidebar() {
       history("*");
     } else {
       setLoginData(data);
-      //history("/dashboard");
     }
   };
 
@@ -146,7 +141,7 @@ export default function Sidebar() {
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
-        <AppBar position="absolute" open={open}>
+        <AppBar position="fixed" open={open}>
           <Toolbar
             sx={{
               pr: "24px", // keep right padding when drawer closed
@@ -164,48 +159,55 @@ export default function Sidebar() {
             >
               <MenuIcon />
             </IconButton>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              sx={{ flexGrow: 1 }}
-            >
-              IT Equipment Specification Management Information System
-            </Typography>
-            <Avatar
-              sx={{
-                width: 50,
-                height: 50,
-                backgroundColor: "#ffffff",
-                fontWeight: "bold",
-                color: "#000000",
-              }}
-              onClick={handleClick}
-            >
-              {loginData?.validUserOne?.firstName?.charAt(0).toUpperCase() +
-                "" +
-                loginData?.validUserOne?.lastName?.charAt(0).toUpperCase()}
-            </Avatar>
-            <Menu
-              id="basic-menu"
-              anchorEl={anchorEl}
-              open={openMenu}
-              onClose={handleClose}
-              MenuListProps={{
-                "aria-labelledby": "basic-button",
-              }}
-            >
-              <MenuItem onClick={handleClose}>Profile</MenuItem>
-              <MenuItem
-                onClick={() => {
-                  logOut();
-                  handleClose();
-                }}
-              >
-                Logout
-              </MenuItem>
-            </Menu>
+            <Grid container alignItems="center">
+              <Grid item xs={12} sm={8} md={10}>
+                <Typography
+                  component="h1"
+                  variant="h6"
+                  color="inherit"
+                  noWrap
+                  sx={{ flexGrow: 1 }}
+                >
+                  IT Equipment Specification Management Information System
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4} md={2} container justifyContent="flex-end">
+                <Avatar
+                  sx={{
+                    width: 50,
+                    height: 50,
+                    backgroundColor: "#ffffff",
+                    fontWeight: "bold",
+                    color: "#000000",
+                    cursor: "pointer",
+                  }}
+                  onClick={handleClick}
+                >
+                  {loginData?.validUserOne?.firstName?.charAt(0).toUpperCase() +
+                    "" +
+                    loginData?.validUserOne?.lastName?.charAt(0).toUpperCase()}
+                </Avatar>
+                <Menu
+                  id="basic-menu"
+                  anchorEl={anchorEl}
+                  open={openMenu}
+                  onClose={handleClose}
+                  MenuListProps={{
+                    "aria-labelledby": "basic-button",
+                  }}
+                >
+                  <MenuItem onClick={handleClose}>Profile</MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      logOut();
+                      handleClose();
+                    }}
+                  >
+                    Logout
+                  </MenuItem>
+                </Menu>
+              </Grid>
+            </Grid>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
