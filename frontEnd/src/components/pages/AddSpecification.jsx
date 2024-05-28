@@ -204,7 +204,7 @@ const AddSpecification = () => {
           {activeStep === steps.length ? (
             <>
               <Typography sx={{ mt: 2, mb: 1 }}>
-                All steps completed - you're finished
+                All steps completed - you are finished
               </Typography>
               <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                 <Box sx={{ flex: "1 1 auto" }} />

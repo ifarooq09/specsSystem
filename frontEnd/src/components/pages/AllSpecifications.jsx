@@ -26,11 +26,14 @@ const AllSpecifications = () => {
     }
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/specifications", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          "http://localhost:3000/specifications",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setSpecifications(response.data);
       } catch (error) {
         console.error(error);
@@ -84,42 +87,45 @@ const AllSpecifications = () => {
           </Button>
         </Paper>
         <Grid container spacing={3} sx={{ mt: 3 }}>
-          {specifications.map((spec) => (
-            <Grid
-              item
-              key={spec._id}
-              xs={12}
-              sm={6}
-              md={4}
-              lg={3} // Adjusted grid size for larger screens
-            >
-              <Card
-                sx={{
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  "&:hover": {
-                    boxShadow: 6,
-                  },
-                }}
-                onClick={() => handleCardClick(spec._id)}
+          {specifications
+            .slice() // Create a shallow copy to avoid mutating the original array
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort by createdAt in descending order
+            .map((spec) => (
+              <Grid
+                item
+                key={spec._id}
+                xs={12}
+                sm={6}
+                md={4}
+                lg={3} // Adjusted grid size for larger screens
               >
-                <CardActionArea sx={{ flexGrow: 1 }}>
-                  <CardMedia
-                    component="img"
-                    height="300"
-                    image={`http://localhost:3000/${spec.document}`}
-                    alt="Document Thumbnail"
-                  />
-                  <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                      {spec.uniqueNumber}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Grid>
-          ))}
+                <Card
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    "&:hover": {
+                      boxShadow: 6,
+                    },
+                  }}
+                  onClick={() => handleCardClick(spec._id)}
+                >
+                  <CardActionArea sx={{ flexGrow: 1 }}>
+                    <CardMedia
+                      component="img"
+                      height="300"
+                      image={`http://localhost:3000/${spec.document}`}
+                      alt="Document Thumbnail"
+                    />
+                    <CardContent>
+                      <Typography gutterBottom variant="h5" component="div">
+                        {spec.uniqueNumber}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </Grid>
+            ))}
         </Grid>
       </Box>
     </>
