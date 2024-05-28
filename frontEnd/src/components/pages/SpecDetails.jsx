@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Typography, Paper } from "@mui/material";
+import { Box, Typography, Paper, Select, MenuItem } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import { useParams } from "react-router-dom";
@@ -10,6 +10,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 const SpecDetails = () => {
   const { id } = useParams();
   const [specDetails, setSpecDetails] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     let token = localStorage.getItem("usersdatatoken");
@@ -18,9 +19,10 @@ const SpecDetails = () => {
       alert("No user token found");
       return;
     }
+
     const fetchData = async () => {
       try {
-        const response = await axios.get(
+        const specResponse = await axios.get(
           `http://localhost:3000/specifications/${id}`,
           {
             headers: {
@@ -28,7 +30,17 @@ const SpecDetails = () => {
             },
           }
         );
-        setSpecDetails(response.data);
+        setSpecDetails(specResponse.data);
+
+        const categoryResponse = await axios.get(
+          'http://localhost:3000/categories',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setCategories(categoryResponse.data);
       } catch (error) {
         console.error(error);
       }
@@ -38,12 +50,12 @@ const SpecDetails = () => {
   }, [id]);
 
   const handleUpdate = async (id, newData) => {
-    console.log(id + newData)
-  }
+    console.log(id + newData);
+  };
 
   const handleDelete = async (id) => {
-    console.log(id)
-  }
+    console.log(id);
+  };
 
   if (!specDetails) {
     return <Typography>Loading...</Typography>;
@@ -66,6 +78,30 @@ const SpecDetails = () => {
     updatedAt: new Date(specDetails.updatedAt).toLocaleString(),
   }));
 
+  // Custom edit component for the category field
+  const CategoryEditComponent = ({ id, value, api, field, colDef }) => {
+    const handleChange = async (event) => {
+      const newValue = event.target.value;
+      api.setEditCellValue({ id, field, value: newValue });
+      await api.commitCellChange({ id, field });
+      api.setCellMode(id, field, 'view');
+    };
+
+    return (
+      <Select
+        value={value}
+        onChange={handleChange}
+        sx={{ width: colDef.width }}
+      >
+        {categories.map((category) => (
+          <MenuItem key={category.id} value={category.categoryName}>
+            {category.categoryName}
+          </MenuItem>
+        ))}
+      </Select>
+    );
+  };
+
   const columns = [
     { field: "id", headerName: "ID", width: 150 },
     { field: "directorate.name", headerName: "Directorate", width: 200 },
@@ -73,11 +109,16 @@ const SpecDetails = () => {
       field: "specifications.category.categoryName",
       headerName: "Category",
       width: 150,
+      editable: true,
+      renderEditCell: (params) => (
+        <CategoryEditComponent {...params} categories={categories} />
+      ),
     },
     {
       field: "specifications.description",
       headerName: "Description",
       width: 300,
+      editable: true,
     },
     { field: "createdBy", headerName: "Created By", width: 200 },
     { field: "createdAt", headerName: "Created At", width: 180 },
@@ -93,7 +134,7 @@ const SpecDetails = () => {
             size="small"
             color="primary"
             onClick={() =>
-              handleUpdate(params.row._id, params.row.categoryName)
+              handleUpdate(params.row._id, params.row["specifications.category.categoryName"])
             }
           >
             <EditIcon />

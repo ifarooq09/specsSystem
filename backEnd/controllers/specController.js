@@ -82,4 +82,39 @@ const getSpecs = async (req, res) => {
       }
 }
 
-export { createSpec, allSpecifications, getSpecs }
+const updateSpec = async (req, res) => {
+  const { id } = req.params;
+  const { category, description, updatedBy } = req.body;
+
+  try {
+    const updatedFields = {};
+    if (category) updatedFields['specifications.$.category'] = category;
+    if (description) updatedFields['specifications.$.description'] = description;
+    if (updatedBy) updatedFields.updatedBy = updatedBy;
+
+    const userInstance = req.rootUser;
+    const updatedSpecification = await specModel.findOneAndUpdate(
+      { _id: id, "specifications._id": category, updatedBy: userInstance._id }, // Find specification by id and category
+      { $set: updatedFields },
+      { new: true }
+    ).populate('createdBy updatedBy', 'firstName lastName');
+
+    if (!updatedSpecification) {
+      return res.status(404).json({ error: "Specification not found" });
+    }
+
+    res.status(200).json({
+      message: "Directorate updated successfully",
+      updatedSpecification: {
+          ...updatedSpecification.toObject(),
+          createdBy: updatedSpecification.createdBy,
+          updatedBy: updatedSpecification.updatedBy
+      }
+  })
+  } catch (error) {
+    console.error("Error updating specification:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+export { createSpec, allSpecifications, getSpecs, updateSpec }
