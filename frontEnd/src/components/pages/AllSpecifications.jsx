@@ -12,6 +12,9 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Fab } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const AllSpecifications = () => {
   const navigate = useNavigate();
@@ -117,10 +120,24 @@ const AllSpecifications = () => {
                       image={`http://localhost:3000/${spec.document}`}
                       alt="Document Thumbnail"
                     />
-                    <CardContent>
+                    <CardContent
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
                       <Typography gutterBottom variant="h5" component="div">
                         {spec.uniqueNumber}
                       </Typography>
+                      <div>
+                        <Fab size="small" color="primary">
+                          <EditIcon />
+                        </Fab>
+                        <Fab size="small" color="secondary" sx={{ ml: 2 }}>
+                          <DeleteIcon />
+                        </Fab>
+                      </div>
                     </CardContent>
                   </CardActionArea>
                 </Card>
