@@ -73,11 +73,6 @@ const AllSpecifications = () => {
     setPage(value);
   };
 
-  const handleEditClick = (event, id) => {
-    event.stopPropagation();
-    navigate(`/specifications/addSpecification/${id}`);
-  };
-
   return (
     <>
       <Box
@@ -177,7 +172,7 @@ const AllSpecifications = () => {
                         {spec.uniqueNumber}
                       </Typography>
                       <div>
-                        <Fab size="small" color="primary" onClick={(event) => handleEditClick(event, spec._id)}>
+                        <Fab size="small" color="primary">
                           <EditIcon />
                         </Fab>
                         <Fab size="small" color="secondary" sx={{ ml: 2 }}>
