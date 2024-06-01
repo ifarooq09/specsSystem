@@ -49,22 +49,44 @@ const SpecDetails = () => {
     fetchData();
   }, [id]);
 
-  const handleDelete = async (id) => {
-    console.log(id);
+  const handleDelete = async (itemId) => {
+    let token = localStorage.getItem("usersdatatoken");
+
+    if (!token) {
+      alert("No user token found");
+      return;
+    }
+
+    try {
+      await axios.delete(
+        `http://localhost:3000/specifications/${id}/items/${itemId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setSpecDetails((prevDetails) => ({
+        ...prevDetails,
+        specifications: prevDetails.specifications.filter(
+          (spec) => spec._id !== itemId
+        ),
+      }));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   if (!specDetails) {
     return <Typography>Loading...</Typography>;
   }
 
-  // Format createdBy and updatedBy fields
   const createdBy = `${specDetails.createdBy.firstName} ${specDetails.createdBy.lastName}`;
   const updatedBy = `${specDetails.updatedBy.firstName} ${specDetails.updatedBy.lastName}`;
 
-  // Create rows array with data for each specification
   const rows = specDetails.specifications.map((spec, index) => ({
     id: index + 1,
-    _id: specDetails._id,
+    _id: spec._id,
     "directorate.name": specDetails.directorate.name,
     "specifications.category.categoryName": spec.category.categoryName,
     "specifications.description": spec.description,
@@ -75,7 +97,7 @@ const SpecDetails = () => {
   }));
 
   const columns = [
-    { field: "id", headerName: "ID", width: 150 },
+    { field: "id", headerName: "ID", width: 100 },
     { field: "directorate.name", headerName: "Directorate", width: 200 },
     {
       field: "specifications.category.categoryName",
@@ -152,7 +174,7 @@ const SpecDetails = () => {
             <DataGrid
               rows={rows}
               columns={columns}
-              pageSize={specDetails.specifications.length} // Set pageSize to show all specifications
+              pageSize={specDetails.specifications.length}
               rowsPerPageOptions={[specDetails.specifications.length]}
             />
           </Box>

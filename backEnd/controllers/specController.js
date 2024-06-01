@@ -117,4 +117,27 @@ const updateSpec = async (req, res) => {
   }
 }
 
-export { createSpec, allSpecifications, getSpecs, updateSpec }
+const deleteItem = async (req, res) => {
+  const { specId, itemId } = req.params;
+  try {
+    const updatedSpec = await specModel.findByIdAndUpdate(
+      specId,
+      { $pull: { specifications: { _id: itemId } } },
+      { new: true }
+    ).populate('createdBy updatedBy', 'firstName lastName');
+
+    if (!updatedSpec) {
+      return res.status(404).json({ error: "Specification not found" });
+    }
+
+    res.status(200).json({
+      message: "Item deleted successfully",
+      updatedSpec,
+    });
+  } catch (error) {
+    console.error("Error deleting item:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export { createSpec, allSpecifications, getSpecs, updateSpec, deleteItem };
