@@ -11,7 +11,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const steps = [
   "Add Unique Number and Estelam",
@@ -21,6 +21,10 @@ const steps = [
 
 const AddSpecification = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+
+  console.log(id)
+  
   const [activeStep, setActiveStep] = useState(0);
   const [uniqueNumber, setUniqueNumber] = useState("");
   const [document, setDocument] = useState(null);
@@ -61,13 +65,34 @@ const AddSpecification = () => {
         ]);
         setDirectorates(dirRes.data);
         setCategories(catRes.data);
+
+        if (id) {
+          const specRes = await axios.get(`http://localhost:3000/specifications/${id}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+              Accept: "application/json",
+            },
+          });
+          const specData = specRes.data;
+          console.log(specData);
+          setUniqueNumber(specData.uniqueNumber);
+          setDocument(specData.document); // You might want to set the file input differently
+          setDirectorate(specData.directorate._id);
+          setSpecifications(specData.specifications.map(spec => ({
+            category: spec.category._id,
+            description: spec.description,
+            categoryName: spec.category.categoryName, // Add this line to include categoryName
+          })));          
+        }
       } catch (error) {
         console.error(error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [id]);
 
   const handleNext = () => {
     if (activeStep === 0) {
@@ -83,7 +108,7 @@ const AddSpecification = () => {
     } else if (activeStep === 2) {
       for (const spec of specifications) {
         if (!spec.category || !spec.description) {
-          setMessage("All category and description fields must be filled.");
+          setMessage("All specifications must have a category and description.");
           return;
         }
       }
@@ -96,75 +121,40 @@ const AddSpecification = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-    setUniqueNumber("");
-    setDocument(null);
-    setDirectorate("");
-    setSpecifications([{ category: "", description: "" }]);
-    setMessage("");
-  };
-
-  const handleAddSpecification = () => {
-    setSpecifications([...specifications, { category: "", description: "" }]);
-  };
-
-  const handleRemoveSpecification = (index) => {
-    const newSpecs = [...specifications];
-    newSpecs.splice(index, 1);
-    setSpecifications(newSpecs);
-  };
-
-  const handleSpecificationChange = (index, field, value) => {
-    const newSpecs = [...specifications];
-    newSpecs[index][field] = value;
-    setSpecifications(newSpecs);
-  };
-
-  const handleFileChange = (e) => {
-    setDocument(e.target.files[0]);
-  };
-
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     let token = localStorage.getItem("usersdatatoken");
 
-    if (!token) {
-      alert("No user token found");
-      return;
-    }
-
-    for (const spec of specifications) {
-      if (!spec.category || !spec.description) {
-        setMessage("All category and description fields must be filled.");
-        return;
-      }
-    }
+    const formData = new FormData();
+    formData.append("uniqueNumber", uniqueNumber);
+    formData.append("document", document);
+    formData.append("directorate", directorate);
+    specifications.forEach((spec, index) => {
+      formData.append(`specifications[${index}][category]`, spec.categoryName);
+      formData.append(`specifications[${index}][description]`, spec.description);
+    });
 
     try {
-      const formData = new FormData();
-      formData.append("uniqueNumber", uniqueNumber);
-      formData.append("document", document);
-      formData.append("directorate", directorate);
-      formData.append("specifications", JSON.stringify(specifications));
-
-      const response = await axios.post(
-        "http://localhost:3000/specifications/addSpecification",
-        formData,
-        {
+      if (id) {
+        await axios.put(`http://localhost:3000/specifications/${id}`, formData, {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
             Accept: "application/json",
           },
-        }
-      );
-
-      setMessage("Specification added successfully!");
-      handleReset();
+        });
+      } else {
+        await axios.post("http://localhost:3000/specifications", formData, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+      }
       navigate("/specifications");
     } catch (error) {
       console.error(error);
-      setMessage("Error adding specification.");
     }
   };
 
@@ -179,7 +169,7 @@ const AddSpecification = () => {
         flexGrow: 1,
         p: 3,
         marginTop: "55px",
-        height: "100vh",
+        minHeight: "100vh",
       }}
     >
       <Paper
@@ -191,149 +181,149 @@ const AddSpecification = () => {
         }}
       >
         <Typography component="h1" variant="h5">
-          Provide New Specification
+          {id ? "Edit Specification" : "Add Specification"}
         </Typography>
-        <Box sx={{ width: "100%" }}>
-          <Stepper activeStep={activeStep}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+        <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+        <form onSubmit={handleSubmit}>
           {activeStep === steps.length ? (
-            <>
-              <Typography sx={{ mt: 2, mb: 1 }}>
-                All steps completed - you are finished
-              </Typography>
-              <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                <Box sx={{ flex: "1 1 auto" }} />
-                <Button onClick={handleReset}>Reset</Button>
-              </Box>
-            </>
+            <Typography variant="h5" gutterBottom>
+              Specification {id ? "Updated" : "Added"} Successfully
+            </Typography>
           ) : (
             <>
-              <Typography sx={{ mt: 2, mb: 1 }}>
-                Step {activeStep + 1}
-              </Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", pt: 2 }}>
-                {activeStep === 0 && (
-                  <>
-                    <TextField
-                      label="Unique Number"
-                      value={uniqueNumber}
-                      onChange={(e) => setUniqueNumber(e.target.value)}
-                      margin="normal"
-                      fullWidth
-                      required
-                    />
-                    <Button
-                      variant="contained"
-                      component="label"
-                      sx={{ mt: 2, mb: 2 }}
-                    >
-                      Upload Image
-                      <input
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        onChange={handleFileChange}
-                      />
-                    </Button>
-                  </>
-                )}
-                {activeStep === 1 && (
+              {activeStep === 0 && (
+                <Box>
                   <TextField
-                    select
-                    label="Select Directorate"
-                    value={directorate}
-                    onChange={(e) => setDirectorate(e.target.value)}
-                    margin="normal"
+                    label="Unique Number"
                     fullWidth
-                    required
-                  >
-                    {directorates.map((dir) => (
-                      <MenuItem key={dir._id} value={dir._id}>
-                        {dir.name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
-                {activeStep === 2 && (
-                  <>
-                    {specifications.map((spec, index) => (
-                      <Box key={index} sx={{ mb: 2 }}>
-                        <TextField
-                          select
-                          label="Select Category"
-                          value={spec.category}
-                          onChange={(e) =>
-                            handleSpecificationChange(
-                              index,
-                              "category",
-                              e.target.value
-                            )
-                          }
-                          margin="normal"
-                          fullWidth
-                          required
-                        >
-                          {categories.map((cat) => (
-                            <MenuItem key={cat._id} value={cat._id}>
-                              {cat.categoryName}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                        <TextField
-                          label="Description"
-                          value={spec.description}
-                          onChange={(e) =>
-                            handleSpecificationChange(
-                              index,
-                              "description",
-                              e.target.value
-                            )
-                          }
-                          margin="normal"
-                          fullWidth
-                          required
-                          multiline
-                          rows={4} // Increased height
-                        />
-                        <Button
-                          onClick={() => handleRemoveSpecification(index)}
-                          sx={{ mt: 1 }}
-                        >
-                          Remove Specification
-                        </Button>
-                      </Box>
-                    ))}
-                    <Button onClick={handleAddSpecification} sx={{ mt: 2 }}>
-                      Add Another Specification
-                    </Button>
-                  </>
-                )}
-                <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                    margin="normal"
+                    value={uniqueNumber}
+                    onChange={(e) => setUniqueNumber(e.target.value)}
+                  />
                   <Button
-                    color="inherit"
-                    disabled={activeStep === 0}
-                    onClick={handleBack}
-                    sx={{ mr: 1 }}
+                    variant="contained"
+                    component="label"
+                    sx={{ mt: 2 }}
                   >
+                    Upload Document
+                    <input
+                      type="file"
+                      hidden
+                      onChange={(e) => setDocument(e.target.files[0])}
+                    />
+                  </Button>
+                </Box>
+              )}
+              {activeStep === 1 && (
+                <TextField
+                  select
+                  label="Select Directorate"
+                  fullWidth
+                  margin="normal"
+                  value={directorate}
+                  onChange={(e) => setDirectorate(e.target.value)}
+                >
+                  {directorates.map((dir) => (
+                    <MenuItem key={dir._id} value={dir._id}>
+                      {dir.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+              {activeStep === 2 && (
+                <>
+                  {specifications.map((spec, index) => (
+                    <Box key={index} sx={{ mb: 2 }}>
+                      <TextField
+                        select
+                        label="Category"
+                        fullWidth
+                        margin="normal"
+                        value={spec.category}
+                        onChange={(e) =>
+                          setSpecifications((prevSpecs) => {
+                            const newSpecs = [...prevSpecs];
+                            newSpecs[index].category = e.target.value;
+                            return newSpecs;
+                          })
+                        }
+                      >
+                        {categories.map((cat) => (
+                          <MenuItem key={cat._id} value={cat._id}>
+                            {cat.categoryName}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                      <TextField
+                        label="Description"
+                        fullWidth
+                        margin="normal"
+                        value={spec.description}
+                        onChange={(e) =>
+                          setSpecifications((prevSpecs) => {
+                            const newSpecs = [...prevSpecs];
+                            newSpecs[index].description = e.target.value;
+                            return newSpecs;
+                          })
+                        }
+                      />
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => {
+                          setSpecifications((prevSpecs) => {
+                            const newSpecs = prevSpecs.filter(
+                              (spec, specIndex) => specIndex !== index
+                            );
+                            return newSpecs;
+                          });
+                        }}
+                      >
+                        Remove Specification
+                      </Button>
+                    </Box>
+                  ))}
+                  <Button
+                    variant="contained"
+                    onClick={() =>
+                      setSpecifications((prevSpecs) => [
+                        ...prevSpecs,
+                        { category: "", description: "" },
+                      ])
+                    }
+                  >
+                    Add Another Specification
+                  </Button>
+                </>
+              )}
+              {message && (
+                <Typography color="error" sx={{ mt: 2 }}>
+                  {message}
+                </Typography>
+              )}
+              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                {activeStep !== 0 && (
+                  <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
                     Back
                   </Button>
-                  <Box sx={{ flex: "1 1 auto" }} />
-                  {activeStep === steps.length - 1 ? (
-                    <Button onClick={handleSubmit}>Finish</Button>
-                  ) : (
-                    <Button onClick={handleNext}>Next</Button>
-                  )}
-                </Box>
+                )}
+                <Button
+                  variant="contained"
+                  onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}
+                  sx={{ mt: 3, ml: 1 }}
+                >
+                  {activeStep === steps.length - 1 ? "Submit" : "Next"}
+                </Button>
               </Box>
             </>
           )}
-          {message && <Typography sx={{ mt: 2, mb: 1, color: 'red' }}>{message}</Typography>}
-        </Box>
+        </form>
       </Paper>
     </Box>
   );

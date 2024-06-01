@@ -18,32 +18,31 @@ import SpecDetails from './components/pages/SpecDetails';
 
 function App() {
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<SignIn />} />
-          <Route path="/dashboard" element={<Dasboard />} />
-          <Route path="/users" element={<UserLayout />}>
-            <Route index element={<AllUsers />} />
-            <Route path="createUser" element={<CreateUser />} />
-          </Route>
-          <Route path="/directorates" element={<DirectorateLayout />} >
-            <Route index element={<AllDirectorates />} />
-            <Route path="addDirectorate" element={<AddDirectorate />} />
-          </Route>
-          <Route path="/categories" element={<CategoryLayout />} >
-            <Route index element={ <AllCategories /> } />
-            <Route path="addCategory" element={<AddCategory />} />
-          </Route>
-          <Route path="/specifications" element={<SpecificationLayout />}>
-            <Route index element={ <AllSpecifications /> } />
-            <Route path="addSpecification" element={<AddSpecification />} />
-            <Route path="/specifications/:id" element={<SpecDetails />} />
-          </Route>
-          <Route path="*" element={<Error />} />
-        </Routes>
-      </BrowserRouter>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<SignIn />} />
+        <Route path="/dashboard" element={<Dasboard />} />
+        <Route path="/users" element={<UserLayout />}>
+          <Route index element={<AllUsers />} />
+          <Route path="createUser" element={<CreateUser />} />
+        </Route>
+        <Route path="/directorates" element={<DirectorateLayout />} >
+          <Route index element={<AllDirectorates />} />
+          <Route path="addDirectorate" element={<AddDirectorate />} />
+        </Route>
+        <Route path="/categories" element={<CategoryLayout />} >
+          <Route index element={<AllCategories />} />
+          <Route path="addCategory" element={<AddCategory />} />
+        </Route>
+        <Route path="/specifications" element={<SpecificationLayout />}>
+          <Route index element={<AllSpecifications />} />
+          <Route path="addSpecification" element={<AddSpecification />} />
+          <Route path="addSpecification/:id" element={<AddSpecification />} />
+          <Route path=":id" element={<SpecDetails />} />
+        </Route>
+        <Route path="*" element={<Error />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
