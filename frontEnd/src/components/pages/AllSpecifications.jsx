@@ -60,6 +60,10 @@ const AllSpecifications = () => {
     navigate(`/specifications/${id}`);
   };
 
+  const handleEditClick = (id) => {
+    navigate(`/specifications/addSpecification/${id}`);
+  };
+
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
     const filteredData = specifications.filter((spec) =>
@@ -152,9 +156,8 @@ const AllSpecifications = () => {
                       boxShadow: 6,
                     },
                   }}
-                  onClick={() => handleCardClick(spec._id)}
                 >
-                  <CardActionArea sx={{ flexGrow: 1 }}>
+                  <CardActionArea sx={{ flexGrow: 1 }} onClick={() => handleCardClick(spec._id)}>
                     <CardMedia
                       component="img"
                       height="300"
@@ -172,7 +175,7 @@ const AllSpecifications = () => {
                         {spec.uniqueNumber}
                       </Typography>
                       <div>
-                        <Fab size="small" color="primary">
+                        <Fab size="small" color="primary" onClick={(e) => { e.stopPropagation(); handleEditClick(spec._id); }}>
                           <EditIcon />
                         </Fab>
                         <Fab size="small" color="secondary" sx={{ ml: 2 }}>

@@ -11,4 +11,4 @@ specRouter.route('/specifications/:id').get(authenticate, getSpecs )
 specRouter.route('/specifications/:id').put(authenticate, updateSpec)
 specRouter.route('/specifications/:specId/items/:itemId').delete(authenticate, deleteItem);
 
-export default specRouter;
+export default specRouter; 
