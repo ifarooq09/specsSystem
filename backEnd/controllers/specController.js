@@ -84,12 +84,21 @@ const getSpecs = async (req, res) => {
 
 const updateSpec = async (req, res) => {
   const { id } = req.params;
-  const { uniqueNumber, directorate, specifications } = req.body;
   const userInstance = req.rootUser;
   let document;
+  let specifications;
 
   if (req.file) {
     document = req.file.path;
+  }
+
+  // Parse specifications if it is a string
+  if (req.body.specifications) {
+    try {
+      specifications = JSON.parse(req.body.specifications);
+    } catch (error) {
+      return res.status(400).json({ message: "Invalid specifications format" });
+    }
   }
 
   try {
@@ -99,8 +108,13 @@ const updateSpec = async (req, res) => {
       return res.status(404).json({ message: "Specification not found" });
     }
 
-    specification.uniqueNumber = uniqueNumber;
-    specification.directorate = directorate;
+    // Ensure required fields are updated
+    if (req.body.uniqueNumber) {
+      specification.uniqueNumber = req.body.uniqueNumber;
+    }
+    if (req.body.directorate) {
+      specification.directorate = req.body.directorate;
+    }
     if (specifications && specifications.length > 0) {
       specification.specifications = specifications.map(spec => ({
         category: spec.category,
@@ -108,7 +122,7 @@ const updateSpec = async (req, res) => {
       }));
     }
     if (document) {
-      specification.document = document;
+      specification.document = document; 
     }
 
     specification.updatedBy = userInstance._id;
@@ -120,6 +134,7 @@ const updateSpec = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 const deleteItem = async (req, res) => {
   const { specId, itemId } = req.params;

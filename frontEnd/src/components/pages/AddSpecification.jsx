@@ -138,7 +138,7 @@ const AddSpecification = () => {
     formData.append("uniqueNumber", uniqueNumber);
     if (document) formData.append("document", document);
     formData.append("directorate", directorate);
-    formData.append("specifications", JSON.stringify(specifications));
+    formData.append("specifications", JSON.stringify(specifications)); // Ensure specifications are a JSON string
   
     try {
       let token = localStorage.getItem("usersdatatoken");
@@ -181,7 +181,6 @@ const AddSpecification = () => {
       );
     }
   };
-  
 
   const handleSpecificationChange = (index, field, value) => {
     const newSpecifications = [...specifications];
