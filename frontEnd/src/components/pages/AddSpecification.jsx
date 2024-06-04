@@ -118,70 +118,70 @@ const AddSpecification = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
-    // Check if there are any changes to the specifications
+
     const isSpecsChanged = specifications.some((spec, index) => {
-      const oldSpec = id ? initialValues.specifications[index] : null;
-      return (
-        spec.category !== (oldSpec ? oldSpec.category._id : "") ||
-        spec.description !== (oldSpec ? oldSpec.description : "")
-      );
+        const oldSpec = id ? initialValues.specifications[index] : null;
+        return (
+            spec.category !== (oldSpec ? oldSpec.category._id : "") ||
+            spec.description !== (oldSpec ? oldSpec.description : "")
+        );
     });
-  
+
+    console.log("Spec is changed: " + isSpecsChanged);
+
     if (!isSpecsChanged) {
-      // If there are no changes in specifications, directly navigate back
-      navigate("/specifications");
-      return;
+        navigate("/specifications");
+        return;
     }
-  
+
     const formData = new FormData();
     formData.append("uniqueNumber", uniqueNumber);
     if (document) formData.append("document", document);
     formData.append("directorate", directorate);
-    formData.append("specifications", JSON.stringify(specifications)); // Ensure specifications are a JSON string
-  
-    try {
-      let token = localStorage.getItem("usersdatatoken");
-      if (!token) {
-        alert("No user token found");
-        return;
-      }
-      let response;
-      if (id) {
-        response = await axios.put(
-          `http://localhost:3000/specifications/${id}`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-      } else {
-        response = await axios.post(
-          "http://localhost:3000/specifications/addSpecification",
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-      }
-      console.log("Response from server:", response.data);
-      navigate("/specifications");
-    } catch (error) {
-      console.error("Error submitting form", error);
-      setMessage(
-        `Error submitting form: ${
-          error.response?.data?.message || error.message
-        }`
-      );
-    }
-  };
+    formData.append("specifications", JSON.stringify(specifications));
 
+    // Log formData contents
+    for (let pair of formData.entries()) {
+        console.log(pair[0]+ ': ' + pair[1]); 
+    }
+
+    try {
+        let token = localStorage.getItem("usersdatatoken");
+        if (!token) {
+            alert("No user token found");
+            return;
+        }
+        let response;
+        if (id) {
+            response = await axios.put(
+                `http://localhost:3000/specifications/${id}`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+        } else {
+            response = await axios.post(
+                "http://localhost:3000/specifications/addSpecification",
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+        }
+        console.log("Response from server:", response.data);
+        navigate("/specifications");
+    } catch (error) {
+        console.error("Error submitting form", error);
+        setMessage(`Error submitting form: ${error.response?.data?.message || error.message}`);
+    }
+};
   const handleSpecificationChange = (index, field, value) => {
     const newSpecifications = [...specifications];
     newSpecifications[index][field] = value;
