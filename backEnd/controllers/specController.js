@@ -152,6 +152,35 @@ const updateSpec = async (req, res) => {
   });
 };
 
+const deleteSpec = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deleteSpec = await specModel.findByIdAndDelete(id);
+
+    if (!deleteSpec) {
+      return res.status(404).json({ error: "Spec not found" });
+    }
+
+    // Remove the specification ID from the corresponding directorate and category documents
+    await Promise.all([
+      directorateModel.updateMany(
+        { specifications: id },
+        { $pull: { specifications: id } }
+      ),
+      categoryModel.updateMany(
+        { specifications: id },
+        { $pull: { specifications: id } }
+      )
+    ]);
+
+    res.status(200).json({ message: "Specification deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting specification: ", error.message);
+    res.status(500).json({ error: "Something went wrong, please try again later" });
+  }
+};
+
 
 const deleteItem = async (req, res) => {
   const { specId, itemId } = req.params;
@@ -176,4 +205,4 @@ const deleteItem = async (req, res) => {
   }
 };
 
-export { createSpec, allSpecifications, getSpecs, updateSpec, deleteItem };
+export { createSpec, allSpecifications, getSpecs, updateSpec, deleteItem, deleteSpec};

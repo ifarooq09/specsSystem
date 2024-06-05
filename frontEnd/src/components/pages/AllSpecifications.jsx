@@ -64,6 +64,39 @@ const AllSpecifications = () => {
     navigate(`/specifications/addSpecification/${id}`);
   };
 
+  const handleDelete = async (id) => {
+    let token = localStorage.getItem("usersdatatoken");
+    try {
+      const res = await fetch(`http://localhost:3000/specifications/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      // Fetch the latest data after deletion
+      const response = await axios.get(
+        "http://localhost:3000/specifications",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setSpecifications(response.data);
+      setFilteredSpecifications(response.data); // Update filtered data
+
+    } catch (error) {
+      console.error("Error deleting category:", error.message);
+    }
+  }
+
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
     const filteredData = specifications.filter((spec) =>
@@ -100,7 +133,14 @@ const AllSpecifications = () => {
             height: "auto",
           }}
         >
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
             <Typography component="h1" variant="h5">
               All Specifications
             </Typography>
@@ -139,14 +179,7 @@ const AllSpecifications = () => {
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .slice((page - 1) * itemsPerPage, page * itemsPerPage)
             .map((spec) => (
-              <Grid
-                item
-                key={spec._id}
-                xs={12}
-                sm={6}
-                md={4}
-                lg={3}
-              >
+              <Grid item key={spec._id} xs={12} sm={6} md={4} lg={3}>
                 <Card
                   sx={{
                     height: "100%",
@@ -157,7 +190,10 @@ const AllSpecifications = () => {
                     },
                   }}
                 >
-                  <CardActionArea sx={{ flexGrow: 1 }} onClick={() => handleCardClick(spec._id)}>
+                  <CardActionArea
+                    sx={{ flexGrow: 1 }}
+                    onClick={() => handleCardClick(spec._id)}
+                  >
                     <CardMedia
                       component="img"
                       height="300"
@@ -175,10 +211,25 @@ const AllSpecifications = () => {
                         {spec.uniqueNumber}
                       </Typography>
                       <div>
-                        <Fab size="small" color="primary" onClick={(e) => { e.stopPropagation(); handleEditClick(spec._id); }}>
+                        <Fab
+                          size="small"
+                          color="primary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditClick(spec._id);
+                          }}
+                        >
                           <EditIcon />
                         </Fab>
-                        <Fab size="small" color="secondary" sx={{ ml: 2 }}>
+                        <Fab
+                          size="small"
+                          color="secondary"
+                          sx={{ ml: 2 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(spec._id);
+                          }}
+                        >
                           <DeleteIcon />
                         </Fab>
                       </div>
@@ -192,7 +243,7 @@ const AllSpecifications = () => {
           count={Math.ceil(filteredSpecifications.length / itemsPerPage)}
           page={page}
           onChange={handleChangePage}
-          sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}
+          sx={{ mt: 3, display: "flex", justifyContent: "center" }}
         />
       </Box>
     </>
