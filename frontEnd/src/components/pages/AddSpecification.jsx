@@ -69,7 +69,7 @@ const AddSpecification = () => {
             }
           );
           const specData = specRes.data;
-          setInitialValues(specData)
+          setInitialValues(specData);
           setUniqueNumber(specData.uniqueNumber);
           setDirectorate(specData.directorate._id);
           setSpecifications(
@@ -119,69 +119,77 @@ const AddSpecification = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const isSpecsChanged = specifications.some((spec, index) => {
-        const oldSpec = id ? initialValues.specifications[index] : null;
+    const initialSpecs = initialValues.specifications || [];
+
+    // Check if specifications have changed
+    const isSpecsChanged =
+      specifications.length !== initialSpecs.length ||
+      specifications.some((spec, index) => {
+        const oldSpec = initialSpecs[index];
         return (
-            spec.category !== (oldSpec ? oldSpec.category._id : "") ||
-            spec.description !== (oldSpec ? oldSpec.description : "")
+          !oldSpec ||
+          spec.category !== oldSpec.category._id ||
+          spec.description !== oldSpec.description
         );
-    });
+      });
 
     console.log("Spec is changed: " + isSpecsChanged);
 
-    if (!isSpecsChanged) {
-        navigate("/specifications");
-        return;
-    }
-
     const formData = new FormData();
     formData.append("uniqueNumber", uniqueNumber);
-    if (document) formData.append("document", document);
+    if (document && document instanceof File) {
+      formData.append("document", document);
+    }
     formData.append("directorate", directorate);
     formData.append("specifications", JSON.stringify(specifications));
 
     // Log formData contents
     for (let pair of formData.entries()) {
-        console.log(pair[0]+ ': ' + pair[1]); 
+      console.log(pair[0] + ": " + pair[1]);
     }
 
     try {
-        let token = localStorage.getItem("usersdatatoken");
-        if (!token) {
-            alert("No user token found");
-            return;
-        }
-        let response;
-        if (id) {
-            response = await axios.put(
-                `http://localhost:3000/specifications/${id}`,
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
-        } else {
-            response = await axios.post(
-                "http://localhost:3000/specifications/addSpecification",
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
-        }
-        console.log("Response from server:", response.data);
-        navigate("/specifications");
+      let token = localStorage.getItem("usersdatatoken");
+      if (!token) {
+        alert("No user token found");
+        return;
+      }
+      let response;
+      if (id) {
+        response = await axios.put(
+          `http://localhost:3000/specifications/${id}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      } else {
+        response = await axios.post(
+          "http://localhost:3000/specifications/addSpecification",
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      }
+      console.log("Response from server:", response.data);
+      navigate("/specifications");
     } catch (error) {
-        console.error("Error submitting form", error);
-        setMessage(`Error submitting form: ${error.response?.data?.message || error.message}`);
+      console.error("Error submitting form", error);
+      setMessage(
+        `Error submitting form: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     }
-};
+  };
+
   const handleSpecificationChange = (index, field, value) => {
     const newSpecifications = [...specifications];
     newSpecifications[index][field] = value;
@@ -259,7 +267,11 @@ const AddSpecification = () => {
                       <input
                         type="file"
                         hidden
-                        onChange={(e) => setDocument(e.target.files[0])}
+                        onChange={(e) => {
+                          if (e.target.files.length > 0) {
+                            setDocument(e.target.files[0]);
+                          }
+                        }}
                       />
                     </Button>
                     {document && (

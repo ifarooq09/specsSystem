@@ -95,7 +95,10 @@ const updateSpec = async (req, res) => {
       let specifications;
 
       if (req.file) {
+        console.log("File uploaded:", req.file);
         document = req.file.path;
+      } else {
+        console.log("No file uploaded");
       }
 
       if (req.body.specifications) {
@@ -112,7 +115,7 @@ const updateSpec = async (req, res) => {
         if (!specification) {
           return res.status(404).json({ message: "Specification not found" });
         }
-  
+
         // Log the incoming data
         console.log("Received uniqueNumber:", req.body.uniqueNumber);
         console.log("Received directorate:", req.body.directorate);
@@ -125,7 +128,7 @@ const updateSpec = async (req, res) => {
         if (req.body.directorate) {
           specification.directorate = req.body.directorate;
         }
-        if (specifications && specifications.length > 0) {
+        if (specifications) {
           specification.specifications = specifications.map(spec => ({
             category: spec.category,
             description: spec.description,
@@ -147,8 +150,8 @@ const updateSpec = async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   });
-
 };
+
 
 const deleteItem = async (req, res) => {
   const { specId, itemId } = req.params;
