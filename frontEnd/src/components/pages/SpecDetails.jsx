@@ -84,17 +84,22 @@ const SpecDetails = () => {
   const createdBy = `${specDetails.createdBy.firstName} ${specDetails.createdBy.lastName}`;
   const updatedBy = `${specDetails.updatedBy.firstName} ${specDetails.updatedBy.lastName}`;
 
-  const rows = specDetails.specifications.map((spec, index) => ({
-    id: index + 1,
-    _id: spec._id,
-    "directorate.name": specDetails.directorate.name,
-    "specifications.category.categoryName": spec.category.categoryName,
-    "specifications.description": spec.description,
-    createdBy: createdBy,
-    createdAt: new Date(specDetails.createdAt).toLocaleString(),
-    updatedBy: updatedBy,
-    updatedAt: new Date(specDetails.updatedAt).toLocaleString(),
-  }));
+  const rows = specDetails.specifications.map((spec, index) => {
+    // Ensure description is correctly formatted
+    const formattedDescription = spec.description.split('-').join('\n-');
+  
+    return {
+      id: index + 1,
+      _id: spec._id,
+      "directorate.name": specDetails.directorate.name,
+      "specifications.category.categoryName": spec.category.categoryName,
+      "specifications.description": formattedDescription,
+      createdBy: createdBy,
+      createdAt: new Date(specDetails.createdAt).toLocaleString(),
+      updatedBy: updatedBy,
+      updatedAt: new Date(specDetails.updatedAt).toLocaleString(),
+    };
+  });
 
   const columns = [
     { field: "id", headerName: "ID", width: 100 },
@@ -108,6 +113,11 @@ const SpecDetails = () => {
       field: "specifications.description",
       headerName: "Description",
       width: 300,
+      renderCell: (params) => (
+        <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", padding: "10px" }}>
+          {params.value}
+        </div>
+      ),
     },
     { field: "createdBy", headerName: "Created By", width: 200 },
     { field: "createdAt", headerName: "Created At", width: 180 },
@@ -131,6 +141,10 @@ const SpecDetails = () => {
       ),
     },
   ];
+
+  const handlePrint = async (id) => {
+    console.log("Print: " + id);
+  };
 
   return (
     <>
@@ -167,15 +181,29 @@ const SpecDetails = () => {
               Specification Details for {specDetails.uniqueNumber}
             </Typography>
             <Fab size="small" color="default">
-              <PrintIcon />
+              <PrintIcon onClick={handlePrint} />
             </Fab>
           </Box>
-          <Box sx={{ height: 400, width: "100%" }}>
+          <Box sx={{ height: 700, width: "100%" }}>
             <DataGrid
               rows={rows}
               columns={columns}
               pageSize={specDetails.specifications.length}
               rowsPerPageOptions={[specDetails.specifications.length]}
+              getRowHeight={() => 'auto'}
+              getEstimatedRowHeight={() => 200}
+              sx={{
+                '& .MuiDataGrid-cell': {
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '10px',
+                  whiteSpace: 'pre-wrap',
+                },
+                '& .MuiDataGrid-columnHeader': {
+                  textAlign: 'center',
+                },
+              }}
             />
           </Box>
         </Paper>
