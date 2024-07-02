@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
-import { Box, Typography, Paper } from "@mui/material";
+import { Box, Typography, Paper, Modal, Fab } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { Fab } from "@mui/material";
 import PrintIcon from '@mui/icons-material/Print';
 import DeleteIcon from "@mui/icons-material/Delete";
+import PrintLayout from "../layout/PrintLayout";
 
 const SpecDetails = () => {
   const { id } = useParams();
   const [specDetails, setSpecDetails] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [printId, setPrintId] = useState(null);
 
   useEffect(() => {
     let token = localStorage.getItem("usersdatatoken");
@@ -114,7 +116,7 @@ const SpecDetails = () => {
       headerName: "Description",
       width: 300,
       renderCell: (params) => (
-        <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", }}>
+        <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", marginBottom: "8px" }}>
           {params.value}
         </div>
       ),
@@ -142,8 +144,13 @@ const SpecDetails = () => {
     },
   ];
 
-  const handlePrint = async (id) => {
-    console.log("Print: " + id);
+  const handlePrint = (id) => {
+    setPrintId(id);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   return (
@@ -180,8 +187,8 @@ const SpecDetails = () => {
             <Typography component="h1" variant="h5">
               Specification Details for {specDetails.uniqueNumber}
             </Typography>
-            <Fab size="small" color="default">
-              <PrintIcon onClick={handlePrint} />
+            <Fab size="small" color="default" onClick={() => handlePrint(id)}>
+              <PrintIcon />
             </Fab>
           </Box>
           <Box sx={{ height: 700, width: "100%" }}>
@@ -208,6 +215,16 @@ const SpecDetails = () => {
           </Box>
         </Paper>
       </Box>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="print-layout-modal"
+        aria-describedby="print-layout-description"
+      >
+        <Box sx={{ p: 4, backgroundColor: 'white', margin: 'auto', mt: 5 }}>
+          <PrintLayout printId={printId} />
+        </Box>
+      </Modal>
     </>
   );
 };
