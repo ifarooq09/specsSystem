@@ -114,7 +114,7 @@ const SpecDetails = () => {
       headerName: "Description",
       width: 300,
       renderCell: (params) => (
-        <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", padding: "10px" }}>
+        <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", }}>
           {params.value}
         </div>
       ),
@@ -196,8 +196,8 @@ const SpecDetails = () => {
                 '& .MuiDataGrid-cell': {
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '10px',
+                  justifyContent: 'left',
+                  textAlign: "center",
                   whiteSpace: 'pre-wrap',
                 },
                 '& .MuiDataGrid-columnHeader': {

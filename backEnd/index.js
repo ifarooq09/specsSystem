@@ -48,12 +48,17 @@ app.use(directorateRouter);
 app.use(categoryRouter);
 app.use(specRouter);
 
+// Add a route to handle GET requests to the root URL
+app.get('/', (req, res) => {
+  res.send('Welcome to the homepage!');
+});
+
 const startServer = async () => {
   try {
     await connectDb(process.env.MONGODB_URL);
     app.listen(port, () => console.log(`Server started on port ${port}`));
   } catch (error) {
-    console.error(error);
+    console.error('Server start error:', error);
   }
 };
 

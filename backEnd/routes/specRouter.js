@@ -12,4 +12,4 @@ specRouter.route('/specifications/:id').put(authenticate, updateSpec)
 specRouter.route('/specifications/:id').delete(authenticate, deleteSpec)
 specRouter.route('/specifications/:specId/items/:itemId').delete(authenticate, deleteItem);
 
-export default specRouter; 
+export default specRouter;  

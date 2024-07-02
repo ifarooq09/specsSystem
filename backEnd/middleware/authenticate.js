@@ -13,7 +13,7 @@ const authenticate = async (req, res, next) => {
 
         const decodedToken = jwt.verify(token, key);
         
-        const rootUser = await userModel.findOne({ _id: decodedToken._id });
+        const rootUser = await userModel.findOne({ _id: decodedToken._id }); 
 
         if (!rootUser) {
             console.error("User not found");
@@ -28,7 +28,7 @@ const authenticate = async (req, res, next) => {
 
         req.token = token;
         req.rootUser = rootUser;
-        req.userId = rootUser._id;
+        req.userId = rootUser._id; 
 
         next();
     } catch (error) {

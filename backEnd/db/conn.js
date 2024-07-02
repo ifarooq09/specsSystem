@@ -1,11 +1,14 @@
-import mongoose from 'mongoose'
+// db/conn.js
+import mongoose from 'mongoose';
 
-const connectDB = (url) => {
-    mongoose.set('strictQuery', true)
+const connectDb = async (url) => {
+  try {
+    await mongoose.connect(url);
+    console.log('Database connected successfully');
+  } catch (error) {
+    console.error('Database connection error:', error);
+    throw error;
+  }
+};
 
-    mongoose.connect(url)
-        .then(() => console.log("MongoDB conected"))
-        .catch((error) => console.log(error))
-}
-
-export default connectDB
+export default connectDb;

@@ -60,7 +60,7 @@ userSchema.pre("save", async function (next) {
     }
     
    next();
-})
+}) 
 
 //token generation
 userSchema.methods.generateAuthToken = async function () {

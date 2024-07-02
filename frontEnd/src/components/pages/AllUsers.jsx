@@ -100,7 +100,7 @@ const AllUsers = () => {
       flex: 1,
       renderCell: (params) => {
         return format(new Date(params.value), "yyyy-MM-dd HH:MM:SS");
-      },
+      }, 
     },
     {
       field: "updatedAt",
