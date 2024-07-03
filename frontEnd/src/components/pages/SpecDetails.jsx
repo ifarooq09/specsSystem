@@ -1,18 +1,19 @@
-import { useEffect, useState } from "react";
-import { Box, Typography, Paper, Modal, Fab } from "@mui/material";
+/* eslint-disable no-unused-vars */
+import { useRef, useState, useEffect } from "react";
+import { Box, Typography, Paper, Fab } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import PrintIcon from '@mui/icons-material/Print';
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useReactToPrint } from "react-to-print";
 import PrintLayout from "../layout/PrintLayout";
 
 const SpecDetails = () => {
   const { id } = useParams();
   const [specDetails, setSpecDetails] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [printId, setPrintId] = useState(null);
+  const printRef = useRef();
 
   useEffect(() => {
     let token = localStorage.getItem("usersdatatoken");
@@ -79,6 +80,34 @@ const SpecDetails = () => {
     }
   };
 
+  const handlePrintAction = useReactToPrint({
+    content: () => printRef.current,
+  });
+
+  const handlePrint = async () => {
+    let token = localStorage.getItem("usersdatatoken");
+
+    if (!token) {
+      alert("No user token found");
+      return;
+    }
+
+    try {
+      const specResponse = await axios.get(
+        `http://localhost:3000/specifications/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setSpecDetails(specResponse.data);
+      handlePrintAction();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   if (!specDetails) {
     return <Typography>Loading...</Typography>;
   }
@@ -87,9 +116,7 @@ const SpecDetails = () => {
   const updatedBy = `${specDetails.updatedBy.firstName} ${specDetails.updatedBy.lastName}`;
 
   const rows = specDetails.specifications.map((spec, index) => {
-    // Ensure description is correctly formatted
     const formattedDescription = spec.description.split('-').join('\n-');
-  
     return {
       id: index + 1,
       _id: spec._id,
@@ -144,15 +171,6 @@ const SpecDetails = () => {
     },
   ];
 
-  const handlePrint = (id) => {
-    setPrintId(id);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   return (
     <>
       <Box
@@ -187,7 +205,7 @@ const SpecDetails = () => {
             <Typography component="h1" variant="h5">
               Specification Details for {specDetails.uniqueNumber}
             </Typography>
-            <Fab size="small" color="default" onClick={() => handlePrint(id)}>
+            <Fab size="small" color="default" onClick={handlePrint}>
               <PrintIcon />
             </Fab>
           </Box>
@@ -215,16 +233,11 @@ const SpecDetails = () => {
           </Box>
         </Paper>
       </Box>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="print-layout-modal"
-        aria-describedby="print-layout-description"
-      >
-        <Box sx={{ p: 4, backgroundColor: 'white', margin: 'auto', mt: 5 }}>
-          <PrintLayout printId={printId} />
-        </Box>
-      </Modal>
+      <div style={{ display: 'none' }}>
+        <div ref={printRef}>
+          <PrintLayout specDetails={specDetails} />
+        </div>
+      </div>
     </>
   );
 };
