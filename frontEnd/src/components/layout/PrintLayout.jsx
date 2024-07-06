@@ -6,6 +6,42 @@ const PrintLayout = ({ specDetails }) => {
     return <div>Loading...</div>;
   }
 
+  const processDescription = (description) => {
+    // Split the description by newlines
+    const lines = description.split("\n");
+
+    // Process each line
+    return (
+      <div>
+        {lines.map((line, index) => {
+          // If the line starts with "-", convert it to a list item
+          if (line.trim().startsWith("-")) {
+            return (
+              <ul
+                key={index}
+                style={{ margin: 0, paddingLeft: "1em", textAlign: "left" }}
+              >
+                <li style={{ listStyleType: "disc", marginLeft: "1em" }}>
+                  {line.trim().substring(1).trim()}
+                </li>
+              </ul>
+            );
+          } else {
+            // Otherwise, return the line as a paragraph
+            return (
+              <p
+                key={index}
+                style={{ margin: 0, textAlign: "left", fontWeight: "bold" }}
+              >
+                {line}
+              </p>
+            );
+          }
+        })}
+      </div>
+    );
+  };
+
   return (
     <>
       <div
@@ -15,7 +51,7 @@ const PrintLayout = ({ specDetails }) => {
           flexWrap: "wrap",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: "10px",
+          padding: "20px",
         }}
       >
         <Avatar
@@ -49,8 +85,8 @@ const PrintLayout = ({ specDetails }) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          paddingLeft: "20px",
-          paddingRight: "20px",
+          paddingLeft: "40px",
+          paddingRight: "40px",
         }}
       >
         <div
@@ -79,7 +115,8 @@ const PrintLayout = ({ specDetails }) => {
         style={{
           display: "flex",
           justifyContent: "center",
-          padding: "20px",
+          paddingLeft: "40px",
+          paddingRight: "40px",
         }}
       >
         <table
@@ -105,10 +142,61 @@ const PrintLayout = ({ specDetails }) => {
               </th>
             </tr>
           </thead>
-          <tbody>{/* Add your table rows here */}</tbody>
+          <tbody>
+            {specDetails.specifications.map((spec, index) => (
+              <tr key={index}>
+                <td
+                  style={{
+                    border: "2px solid",
+                    padding: "5px",
+                    width: "10%",
+                    textAlign: "center",
+                  }}
+                >
+                  {index + 1}
+                </td>
+                <td
+                  style={{
+                    border: "2px solid",
+                    padding: "5px",
+                    width: "20%",
+                    textAlign: "center",
+                  }}
+                >
+                  {spec.category.categoryName}
+                </td>
+                <td
+                  style={{
+                    border: "2px solid",
+                    padding: "5px",
+                    width: "50%",
+                    textAlign: "center",
+                  }}
+                >
+                  {processDescription(spec.description)}
+                </td>
+                <td
+                  style={{
+                    border: "2px solid",
+                    padding: "5px",
+                    width: "20%",
+                    textAlign: "center",
+                  }}
+                >
+                  One Year Warranty
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
-      <div style={{ textAlign: "right", padding: "20px" }}>
+      <div
+        style={{
+          textAlign: "right",
+          paddingLeft: "40px",
+          paddingRight: "40px",
+        }}
+      >
         <p>
           چون بازار وسایل تکنالوژی معلوماتی به سرعت در حال تغیر میباشد در صورت
           عدم پیدایش جنس مذکور بعد از بک ماه ریاست تکنالوژی معلوماتی مسئولیت
@@ -119,8 +207,8 @@ const PrintLayout = ({ specDetails }) => {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          paddingLeft: "20px",
-          paddingRight: "20px",
+          paddingLeft: "40px",
+          paddingRight: "40px",
         }}
       >
         {/* Right Side Content */}
@@ -128,7 +216,7 @@ const PrintLayout = ({ specDetails }) => {
           style={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-end", 
+            alignItems: "flex-end",
             textAlign: "right",
           }}
         >
@@ -137,7 +225,7 @@ const PrintLayout = ({ specDetails }) => {
             <strong style={{ marginLeft: "10px" }}>: تائید کننده</strong>
           </div>
           <div style={{ display: "flex", alignItems: "center" }}>
-            <span>آمریت خدمات تکنالوژی معلوماتی</span>
+            <span>آمر خدمات تکنالوژی معلوماتی</span>
             <strong style={{ marginLeft: "10px" }}>: وظیفه</strong>
           </div>
           <div>
@@ -153,8 +241,8 @@ const PrintLayout = ({ specDetails }) => {
           style={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-end", 
-            textAlign: "right", 
+            alignItems: "flex-end",
+            textAlign: "right",
           }}
         >
           <div style={{ display: "flex", alignItems: "center" }}>

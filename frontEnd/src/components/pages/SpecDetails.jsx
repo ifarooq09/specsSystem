@@ -4,7 +4,7 @@ import { Box, Typography, Paper, Fab } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import PrintIcon from '@mui/icons-material/Print';
+import PrintIcon from "@mui/icons-material/Print";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useReactToPrint } from "react-to-print";
 import PrintLayout from "../layout/PrintLayout";
@@ -116,7 +116,7 @@ const SpecDetails = () => {
   const updatedBy = `${specDetails.updatedBy.firstName} ${specDetails.updatedBy.lastName}`;
 
   const rows = specDetails.specifications.map((spec, index) => {
-    const formattedDescription = spec.description.split('-').join('\n-');
+    const formattedDescription = spec.description.split("-").join("\n-");
     return {
       id: index + 1,
       _id: spec._id,
@@ -143,7 +143,15 @@ const SpecDetails = () => {
       headerName: "Description",
       width: 300,
       renderCell: (params) => (
-        <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", marginBottom: "8px" }}>
+        <div
+          style={{
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+            marginBottom: "8px",
+            marginTop: "2px",
+            textAlign: "left"
+          }}
+        >
           {params.value}
         </div>
       ),
@@ -215,25 +223,25 @@ const SpecDetails = () => {
               columns={columns}
               pageSize={specDetails.specifications.length}
               rowsPerPageOptions={[specDetails.specifications.length]}
-              getRowHeight={() => 'auto'}
+              getRowHeight={() => "auto"}
               getEstimatedRowHeight={() => 200}
               sx={{
-                '& .MuiDataGrid-cell': {
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'left',
+                "& .MuiDataGrid-cell": {
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "left",
                   textAlign: "center",
-                  whiteSpace: 'pre-wrap',
+                  whiteSpace: "pre-wrap",
                 },
-                '& .MuiDataGrid-columnHeader': {
-                  textAlign: 'center',
+                "& .MuiDataGrid-columnHeader": {
+                  textAlign: "center",
                 },
               }}
             />
           </Box>
         </Paper>
       </Box>
-      <div style={{ display: 'none' }}>
+      <div style={{ display: "none" }}>
         <div ref={printRef}>
           <PrintLayout specDetails={specDetails} />
         </div>
