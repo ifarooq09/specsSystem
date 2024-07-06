@@ -42,9 +42,7 @@ const login = async (req, res) => {
         return res.status(420).json({ error: "Please provide email and password" });
     }
     try {
-        console.log("Email received:", email);
         const userValid = await userModel.findOne({ email: new RegExp(`^${email}$`, 'i') });
-        console.log("User found:", userValid);
         if (!userValid) {
             return res.status(421).json({ error: "User not found" });
         }
