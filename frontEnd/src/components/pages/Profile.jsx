@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../layout/Sidebar";
-import { Box, Toolbar, Typography, Paper, Avatar, Button, Grid } from "@mui/material";
+import {
+  Box,
+  Toolbar,
+  Typography,
+  Paper,
+  Avatar,
+  Button,
+  Grid,
+} from "@mui/material";
 import EditProfile from "../../../EdirProfile";
 
 const Profile = () => {
@@ -78,31 +86,49 @@ const Profile = () => {
             <Box sx={{ width: "100%", mt: 3 }}>
               <Grid container spacing={2} justifyContent="center">
                 <Grid item xs={6}>
-                  <Typography variant="body1" align="right">First Name:</Typography>
+                  <Typography variant="body1" align="right">
+                    First Name:
+                  </Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body1">{loginData?.validUserOne?.firstName}</Typography>
+                  <Typography variant="body1">
+                    {loginData?.validUserOne?.firstName}
+                  </Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body1" align="right">Last Name:</Typography>
+                  <Typography variant="body1" align="right">
+                    Last Name:
+                  </Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body1">{loginData?.validUserOne?.lastName}</Typography>
+                  <Typography variant="body1">
+                    {loginData?.validUserOne?.lastName}
+                  </Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body1" align="right">Email:</Typography>
+                  <Typography variant="body1" align="right">
+                    Email:
+                  </Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body1">{loginData?.validUserOne?.email}</Typography>
+                  <Typography variant="body1">
+                    {loginData?.validUserOne?.email}
+                  </Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body1" align="right">Role:</Typography>
+                  <Typography variant="body1" align="right">
+                    Role:
+                  </Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body1">{loginData?.validUserOne?.role}</Typography>
+                  <Typography variant="body1">
+                    {loginData?.validUserOne?.role}
+                  </Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body1" align="right">Status:</Typography>
+                  <Typography variant="body1" align="right">
+                    Status:
+                  </Typography>
                 </Grid>
                 <Grid item xs={6}>
                   <Typography variant="body1">
