@@ -183,7 +183,7 @@ const PrintLayout = ({ specDetails }) => {
                     textAlign: "center",
                   }}
                 >
-                  One Year Warranty
+                  {spec.warranty}
                 </td>
               </tr>
             ))}

@@ -24,6 +24,10 @@ const specSchema = new mongoose.Schema({
         description: {
             type: String,
             required: true
+        },
+        warranty: {
+            type: String,
+            required: true
         }
     }],
     createdBy: {

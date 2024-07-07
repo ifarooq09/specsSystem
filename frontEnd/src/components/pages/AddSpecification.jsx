@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -27,7 +28,7 @@ const AddSpecification = () => {
   const [document, setDocument] = useState(null);
   const [directorate, setDirectorate] = useState("");
   const [specifications, setSpecifications] = useState([
-    { category: "", description: "" },
+    { category: "", description: "", warranty: "" },
   ]);
   const [directorates, setDirectorates] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -76,6 +77,7 @@ const AddSpecification = () => {
             specData.specifications.map((spec) => ({
               category: spec.category._id,
               description: spec.description,
+              warranty: spec.warranty || "",
             }))
           );
           // Don't require document if editing
@@ -129,7 +131,8 @@ const AddSpecification = () => {
         return (
           !oldSpec ||
           spec.category !== oldSpec.category._id ||
-          spec.description !== oldSpec.description
+          spec.description !== oldSpec.description ||
+          spec.warranty !== oldSpec.warranty
         );
       });
 
@@ -178,10 +181,10 @@ const AddSpecification = () => {
           }
         );
       }
-      console.log("Response from server:", response.data);
+      
       navigate("/specifications");
     } catch (error) {
-      console.error("Error submitting form", error);
+      
       setMessage(
         `Error submitting form: ${
           error.response?.data?.message || error.message
@@ -197,7 +200,10 @@ const AddSpecification = () => {
   };
 
   const handleAddSpecification = () => {
-    setSpecifications([...specifications, { category: "", description: "" }]);
+    setSpecifications([
+      ...specifications,
+      { category: "", description: "", warranty: "" },
+    ]);
   };
 
   const handleRemoveSpecification = (index) => {
@@ -346,6 +352,23 @@ const AddSpecification = () => {
                           }
                           multiline
                           rows={10}
+                          sx={{ mb: 2 }}
+                        />
+                        <TextField
+                          required
+                          id={`warranty-${index}`}
+                          name={`warranty-${index}`}
+                          label="Warranty"
+                          fullWidth
+                          variant="outlined"
+                          value={spec.warranty}
+                          onChange={(e) =>
+                            handleSpecificationChange(
+                              index,
+                              "warranty",
+                              e.target.value
+                            )
+                          }
                           sx={{ mb: 2 }}
                         />
                         <Button

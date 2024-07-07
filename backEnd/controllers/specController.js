@@ -116,12 +116,6 @@ const updateSpec = async (req, res) => {
           return res.status(404).json({ message: "Specification not found" });
         }
 
-        // Log the incoming data
-        console.log("Received uniqueNumber:", req.body.uniqueNumber);
-        console.log("Received directorate:", req.body.directorate);
-        console.log("Received specifications:", specifications);
-        console.log("Received document:", document);
-
         if (req.body.uniqueNumber) {
           specification.uniqueNumber = req.body.uniqueNumber;
         }
@@ -132,6 +126,7 @@ const updateSpec = async (req, res) => {
           specification.specifications = specifications.map(spec => ({
             category: spec.category,
             description: spec.description,
+            warranty: spec.warranty,
           }));
         }
         if (document) {
