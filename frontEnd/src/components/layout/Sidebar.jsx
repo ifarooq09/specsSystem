@@ -87,6 +87,7 @@ export default function Sidebar() {
   };
   const handleClose = () => {
     setAnchorEl(null);
+    history("/profile");
   };
 
   const dashboardValid = async () => {

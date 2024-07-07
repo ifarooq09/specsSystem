@@ -136,7 +136,7 @@ const AddSpecification = () => {
         );
       });
 
-    console.log("Spec is changed: " + isSpecsChanged);
+    // console.log("Spec is changed: " + isSpecsChanged);
 
     const formData = new FormData();
     formData.append("uniqueNumber", uniqueNumber);
@@ -146,10 +146,10 @@ const AddSpecification = () => {
     formData.append("directorate", directorate);
     formData.append("specifications", JSON.stringify(specifications));
 
-    // Log formData contents
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": " + pair[1]);
-    }
+    // // Log formData contents
+    // for (let pair of formData.entries()) {
+    //   console.log(pair[0] + ": " + pair[1]);
+    // }
 
     try {
       let token = localStorage.getItem("usersdatatoken");

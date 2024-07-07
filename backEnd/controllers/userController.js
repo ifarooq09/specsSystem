@@ -105,6 +105,27 @@ const updateUser = async (req, res) => {
     }
 };
 
+const editProfile = async (req, res) => {
+    try {
+      const { firstName, lastName, email, password } = req.body;
+      const hashedPassword = password ? await bcrypt.hash(password, 12) : undefined;
+  
+      const updateData = {
+        firstName,
+        lastName,
+        email,
+      };
+  
+      if (hashedPassword) {
+        updateData.password = hashedPassword;
+      }
+  
+      const updatedUser = await userModel.findByIdAndUpdate(req.userId, updateData, { new: true });
+      res.status(200).json({ status: 200, updatedUser });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  };
 
 //user logout
 const logout = async (req, res) => {
@@ -120,4 +141,4 @@ const logout = async (req, res) => {
     }
 }
  
-export { createUser, login, validuser, logout, alluser, updateUser };
+export { createUser, login, validuser, logout, alluser, updateUser, editProfile };
