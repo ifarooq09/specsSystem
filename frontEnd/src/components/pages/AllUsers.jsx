@@ -1,15 +1,18 @@
-import { Box, Paper, Typography, Button } from "@mui/material";
+import { Box, Paper, Typography, Button, IconButton } from "@mui/material";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { grey } from "@mui/material/colors";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import UserActions from "./UserActions";
 
 const AllUsers = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [rowId, setRowId] = useState(null);
+  const [showPassword, setShowPassword] = useState({});
 
   useEffect(() => {
     let token = localStorage.getItem("usersdatatoken");
@@ -84,6 +87,10 @@ const AllUsers = () => {
     }
   };
 
+  const handleTogglePassword = (id) => {
+    setShowPassword((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "firstName", headerName: "First name", flex: 1 },
@@ -93,10 +100,16 @@ const AllUsers = () => {
       field: "password",
       headerName: "Password",
       flex: 1,
-      type: "password",
       editable: true,
       renderCell: (params) => (
-        <input type="password" value={params.value} readOnly />
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {params.isEditable && showPassword[params.row.id]
+            ? params.value
+            : '****'}
+          <IconButton onClick={() => handleTogglePassword(params.row.id)} size="small">
+            {showPassword[params.row.id] ? <VisibilityIcon /> : <VisibilityOffIcon />}
+          </IconButton>
+        </div>
       ),
     },
     {
@@ -202,6 +215,7 @@ const AllUsers = () => {
                 },
               }}
               onCellEditStart={(params) => setRowId(params.id)}
+              onCellEditStop={(params) => setShowPassword((prev) => ({ ...prev, [params.id]: false }))}
               processRowUpdate={(newRow) => {
                 handleSave(newRow);
                 return newRow;
