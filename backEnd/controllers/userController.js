@@ -97,13 +97,22 @@ const alluser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const { role, active } = req.body;
-        await userModel.findByIdAndUpdate(req.params.userId, { role, active });
-        res.status(200).json({ success: true, result: { _id: req.params.userId } });
+      const { role, active, password } = req.body;
+  
+      const updateFields = { role, active };
+  
+      if (password) {
+        const hashedPassword = await bcrypt.hash(password, 12); // Hash the password before saving
+        updateFields.password = hashedPassword;
+      }
+  
+      await userModel.findByIdAndUpdate(req.params.userId, updateFields);
+      res.status(200).json({ success: true, result: { _id: req.params.userId } });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+      res.status(500).json({ success: false, message: error.message });
     }
 };
+  
 
 const editProfile = async (req, res) => {
     try {

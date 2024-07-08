@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Box, CircularProgress, Fab } from "@mui/material";
 import { green } from "@mui/material/colors";
 import { useEffect, useState } from "react";

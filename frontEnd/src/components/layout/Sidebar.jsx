@@ -116,27 +116,36 @@ export default function Sidebar() {
 
   const logOut = async () => {
     let token = localStorage.getItem("usersdatatoken");
-
-    const res = await fetch("http://localhost:3000/logout", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-      credentials: "include",
-    });
-
-    const data = await res.json();
-
-    if (data.status != 200) {
-      console.log("error");
-    } else {
-      localStorage.removeItem("usersdatatoken");
-      setLoginData(false);
-      history("/");
+  
+    try {
+      const res = await fetch("http://localhost:3000/logout", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json",
+        },
+        credentials: "include",
+      });
+  
+      if (!res.ok) {
+        throw new Error("Logout failed");
+      }
+  
+      const data = await res.json();
+  
+      if (data.status !== 200) {
+        console.log("error");
+      } else {
+        localStorage.removeItem("usersdatatoken");
+        setLoginData(false);
+        history("/");
+      }
+    } catch (error) {
+      console.error("Error:", error);
     }
   };
+  
 
   return (
     <ThemeProvider theme={defaultTheme}>

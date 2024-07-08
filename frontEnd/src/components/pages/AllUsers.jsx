@@ -57,6 +57,7 @@ const AllUsers = () => {
         body: JSON.stringify({
           role: row.role,
           active: row.active,
+          password: row.password, // Add password to the update request
         }),
       });
 
@@ -66,7 +67,16 @@ const AllUsers = () => {
 
       const data = await res.json();
       if (data.success) {
-        const updatedUsers = users.map((user) => (user._id === data.result._id ? { ...user, role: row.role, active: row.active } : user));
+        const updatedUsers = users.map((user) =>
+          user._id === data.result._id
+            ? {
+                ...user,
+                role: row.role,
+                active: row.active,
+                password: row.password,
+              }
+            : user
+        );
         setUsers(updatedUsers);
       }
     } catch (error) {
@@ -79,6 +89,16 @@ const AllUsers = () => {
     { field: "firstName", headerName: "First name", flex: 1 },
     { field: "lastName", headerName: "Last name", flex: 1 },
     { field: "email", headerName: "Email", flex: 2 },
+    {
+      field: "password",
+      headerName: "Password",
+      flex: 1,
+      type: "password",
+      editable: true,
+      renderCell: (params) => (
+        <input type="password" value={params.value} readOnly />
+      ),
+    },
     {
       field: "role",
       headerName: "Role",
@@ -100,7 +120,7 @@ const AllUsers = () => {
       flex: 1,
       renderCell: (params) => {
         return format(new Date(params.value), "yyyy-MM-dd HH:MM:SS");
-      }, 
+      },
     },
     {
       field: "updatedAt",
@@ -115,7 +135,9 @@ const AllUsers = () => {
       headerName: "Actions",
       flex: 1,
       renderCell: (params) => {
-        return <UserActions {...{ params, rowId, setRowId, onSave: handleSave }} />;
+        return (
+          <UserActions {...{ params, rowId, setRowId, onSave: handleSave }} />
+        );
       },
     },
   ];
