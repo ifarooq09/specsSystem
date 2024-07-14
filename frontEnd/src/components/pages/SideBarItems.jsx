@@ -8,6 +8,7 @@ import { SiAwsorganizations } from "react-icons/si";
 import { TbCategoryMinus } from "react-icons/tb";
 import { MdDevicesOther } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { SummarizeOutlined } from "@mui/icons-material";
 
 const SideBarItems = () => {
   const navigate = useNavigate(); // Correctly use useNavigate hook
@@ -38,6 +39,11 @@ const SideBarItems = () => {
       icon: <MdDevicesOther style={{ height: 20, width: 20}}/>,
       path: "/specifications"
     },
+    {
+      text: "Reports",
+      icon: <SummarizeOutlined style={{ height: 20, width: 20}}/>,
+      path: "/reports"
+    }
   ];
 
   return (

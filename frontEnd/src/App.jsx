@@ -16,6 +16,7 @@ import SpecificationLayout from './components/layout/SpecificationLayout';
 import AddSpecification from './components/pages/AddSpecification';
 import SpecDetails from './components/pages/SpecDetails';
 import Profile from './components/pages/Profile';
+import Reports from './components/pages/Reports';
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
           <Route path=":id" element={<SpecDetails />} />
         </Route>
         <Route path='/profile' element={<Profile />} />
+        <Route path='/reports' element={<Reports />} />
         <Route path="*" element={<Error />} />
       </Routes>
     </BrowserRouter>
