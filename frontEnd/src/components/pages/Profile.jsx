@@ -9,7 +9,7 @@ import {
   Button,
   Grid,
 } from "@mui/material";
-import EditProfile from "../../../EdirProfile";
+import EditProfile from "./EditProfile";
 
 const Profile = () => {
   const [loginData, setLoginData] = useState({});
