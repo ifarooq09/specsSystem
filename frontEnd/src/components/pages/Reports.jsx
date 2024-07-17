@@ -1,6 +1,5 @@
 import Sidebar from "../layout/Sidebar";
-import { Box, Paper, Typography } from "@mui/material";
-import { Grid, FormControl, InputLabel, Select, MenuItem, Button } from "@mui/material";
+import { Box, Paper, Typography, Grid, FormControl, InputLabel, Select, MenuItem, Button } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -49,22 +48,22 @@ const Reports = () => {
       const data = await res.json();
       let formattedData = [];
 
-      if (selectedGroup == "all") {
+      if (selectedGroup === "all") {
         formattedData = [{ value: "all", display: "All" }];
       } else if (selectedGroup === "users") {
-        formattedData = data.map(user => ({
-          value: `${user.firstName} ${user.lastName}`,
-          display: `${user.firstName} ${user.lastName}`
+        formattedData = data.map((user) => ({
+          value: user._id,
+          display: `${user.firstName} ${user.lastName}`,
         }));
       } else if (selectedGroup === "directorates") {
-        formattedData = data.map(directorate => ({
+        formattedData = data.map((directorate) => ({
           value: directorate.name,
-          display: directorate.name
+          display: directorate.name,
         }));
       } else if (selectedGroup === "categories") {
-        formattedData = data.map(category => ({
+        formattedData = data.map((category) => ({
           value: category.categoryName,
-          display: category.categoryName
+          display: category.categoryName,
         }));
       }
 
@@ -76,6 +75,50 @@ const Reports = () => {
 
   const handleSubGroupChange = (event) => {
     setSelectedSubGroup(event.target.value);
+  };
+
+  const generateReport = async (event) => {
+    event.preventDefault();
+
+    let token = localStorage.getItem("usersdatatoken");
+
+    if (!token) {
+      alert("No user token found");
+      return;
+    }
+
+    const formattedStartDate = startDate.format('YYYY-MM-DD');
+    const formattedEndDate = endDate.format('YYYY-MM-DD');
+
+    let url = "http://localhost:3000/";
+    if (group === "all") {
+      url += "specifications";
+    } else if (group === "users") {
+      url += `${group}/${selectedSubGroup}/report?startDate=${formattedStartDate}&endDate=${formattedEndDate}`;
+    } else {
+      url += `${group}/${selectedSubGroup}?startDate=${formattedStartDate}&endDate=${formattedEndDate}`;
+    }
+
+    try {
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Error fetching report: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error.message);
+    }
+    
   };
 
   return (
@@ -109,7 +152,7 @@ const Reports = () => {
             <Box
               component="form"
               noValidate
-              //   onSubmit={}
+              onSubmit={generateReport}
               sx={{ mt: 3 }}
             >
               <Grid container spacing={2}>
@@ -132,7 +175,7 @@ const Reports = () => {
                   </FormControl>
                 </Grid>
               </Grid>
-              <Grid container spacing={2} sx={{ mt: 3 }}>
+              <Grid container spacing={2} sx={{ mt: 1 }}>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth required>
                     <InputLabel id="role-label-subgroup">Select</InputLabel>
@@ -154,7 +197,7 @@ const Reports = () => {
                 </Grid>
               </Grid>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Grid container spacing={2} sx={{ mt: 3 }}>
+                <Grid container spacing={2} sx={{ mt: 1 }}>
                   <Grid item xs={6} sm={3}>
                     <DatePicker
                       label="Start Date"

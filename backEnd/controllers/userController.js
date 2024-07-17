@@ -130,18 +130,42 @@ const editProfile = async (req, res) => {
 const getUserReport = async (req, res) => {
     try {
         const userId = req.params.id;
-        const specs = await specModel.find({
+        const { startDate, endDate } = req.query;
+
+        // Construct the date filter
+        let dateFilter = {};
+        if (startDate) {
+            dateFilter.$gte = new Date(startDate);
+        }
+        if (endDate) {
+            // Include the entire day for endDate by setting time to the end of the day
+            dateFilter.$lte = new Date(new Date(endDate).setHours(23, 59, 59, 999));
+        }
+
+        // Build the query conditions
+        let queryConditions = {
             $or: [
                 { createdBy: userId },
                 { updatedBy: userId },
             ]
-        }).populate('createdBy', 'firstName lastName').populate('updatedBy', 'firstName lastName');
+        };
+
+        // Add the date filter to the query if both startDate and endDate are provided
+        if (startDate || endDate) {
+            queryConditions.createdAt = dateFilter;
+        }
+
+        const specs = await specModel.find(queryConditions)
+            .populate('createdBy', 'firstName lastName')
+            .populate('updatedBy', 'firstName lastName');
 
         res.status(200).json({ status: 200, specs });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+
 
 const logout = async (req, res) => {
     try {
