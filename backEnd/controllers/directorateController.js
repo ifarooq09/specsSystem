@@ -99,4 +99,5 @@ const alldirectorate = async (req, res) => {
   }
 };
 
+
 export { createDirectorate, updateDirectorate, deleteDirectorate, alldirectorate };

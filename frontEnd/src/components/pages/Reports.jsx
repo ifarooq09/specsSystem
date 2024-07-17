@@ -1,13 +1,6 @@
 import Sidebar from "../layout/Sidebar";
 import { Box, Paper, Typography } from "@mui/material";
-import {
-  Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Button,
-} from "@mui/material";
+import { Grid, FormControl, InputLabel, Select, MenuItem, Button } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -17,6 +10,73 @@ import { useState } from "react";
 const Reports = () => {
   const [startDate, setStartDate] = useState(dayjs());
   const [endDate, setEndDate] = useState(dayjs());
+  const [group, setGroup] = useState("");
+  const [subGroup, setSubGroup] = useState([]);
+  const [selectedSubGroup, setSelectedSubGroup] = useState("");
+
+  const handleGroupChange = async (event) => {
+    const selectedGroup = event.target.value;
+    setGroup(selectedGroup);
+
+    let token = localStorage.getItem("usersdatatoken");
+
+    if (!token) {
+      alert("No user token found");
+      return;
+    }
+
+    let url = "http://localhost:3000/";
+    if (selectedGroup === "all") {
+      url += "specifications";
+    } else {
+      url += selectedGroup;
+    }
+
+    try {
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Error fetching sub-groups: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      let formattedData = [];
+
+      if (selectedGroup == "all") {
+        formattedData = [{ value: "all", display: "All" }];
+      } else if (selectedGroup === "users") {
+        formattedData = data.map(user => ({
+          value: `${user.firstName} ${user.lastName}`,
+          display: `${user.firstName} ${user.lastName}`
+        }));
+      } else if (selectedGroup === "directorates") {
+        formattedData = data.map(directorate => ({
+          value: directorate.name,
+          display: directorate.name
+        }));
+      } else if (selectedGroup === "categories") {
+        formattedData = data.map(category => ({
+          value: category.categoryName,
+          display: category.categoryName
+        }));
+      }
+
+      setSubGroup(formattedData);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const handleSubGroupChange = (event) => {
+    setSelectedSubGroup(event.target.value);
+  };
 
   return (
     <>
@@ -55,17 +115,40 @@ const Reports = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth required>
-                    <InputLabel id="role-label">Select</InputLabel>
+                    <InputLabel id="role-label-group">Select</InputLabel>
                     <Select
                       labelId="role-label"
-                      id="role"
-                      name="role"
-                      //   value={}
-                      label="Role"
-                      //   onChange={}
+                      id="group"
+                      name="group"
+                      value={group}
+                      label="Group"
+                      onChange={handleGroupChange}
                     >
-                      <MenuItem value="admin">Admin</MenuItem>
-                      <MenuItem value="user">User</MenuItem>
+                      <MenuItem value="all">All</MenuItem>
+                      <MenuItem value="users">Users</MenuItem>
+                      <MenuItem value="directorates">Directorates</MenuItem>
+                      <MenuItem value="categories">Categories</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+              <Grid container spacing={2} sx={{ mt: 3 }}>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth required>
+                    <InputLabel id="role-label-subgroup">Select</InputLabel>
+                    <Select
+                      labelId="role-label-subgroup"
+                      id="subgroup"
+                      name="subgroup"
+                      value={selectedSubGroup}
+                      label="Sub-Group"
+                      onChange={handleSubGroupChange}
+                    >
+                      {subGroup.map((sub, index) => (
+                        <MenuItem key={index} value={sub.value}>
+                          {sub.display}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>

@@ -1,4 +1,5 @@
 import userModel from "../models/userSchema.js";
+import specModel from "../models/specsSchema.js";
 import bcrypt from "bcryptjs";
 
 const createUser = async (req, res) => {
@@ -126,6 +127,22 @@ const editProfile = async (req, res) => {
     }
 };
 
+const getUserReport = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const specs = await specModel.find({
+            $or: [
+                { createdBy: userId },
+                { updatedBy: userId },
+            ]
+        }).populate('createdBy', 'firstName lastName').populate('updatedBy', 'firstName lastName');
+
+        res.status(200).json({ status: 200, specs });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 const logout = async (req, res) => {
     try {
         req.rootUser.tokens = req.rootUser.tokens.filter((curelem) => {
@@ -139,4 +156,4 @@ const logout = async (req, res) => {
     }
 };
 
-export { createUser, login, validuser, logout, alluser, updateUser, editProfile };
+export { createUser, login, validuser, logout, alluser, updateUser, editProfile, getUserReport };
