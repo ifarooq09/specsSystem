@@ -1,5 +1,15 @@
 import Sidebar from "../layout/Sidebar";
-import { Box, Paper, Typography, Grid, FormControl, InputLabel, Select, MenuItem, Button } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Typography,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+} from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -87,8 +97,8 @@ const Reports = () => {
       return;
     }
 
-    const formattedStartDate = startDate.format('YYYY-MM-DD');
-    const formattedEndDate = endDate.format('YYYY-MM-DD');
+    const formattedStartDate = startDate.format("YYYY-MM-DD");
+    const formattedEndDate = endDate.format("YYYY-MM-DD");
 
     let url = "http://localhost:3000/";
     if (group === "all") {
@@ -118,11 +128,16 @@ const Reports = () => {
     } catch (error) {
       console.error(error.message);
     }
-    
   };
 
-  console.log(group)
-  console.log(selectedSubGroup)
+  const handleReset = () => {
+    // Reset fields except endDate
+    setStartDate(dayjs()); 
+    setEndDate(dayjs());
+    setGroup(""); 
+    setSubGroup([]); 
+    setSelectedSubGroup(""); 
+  };
 
   return (
     <>
@@ -219,6 +234,13 @@ const Reports = () => {
               </LocalizationProvider>
               <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
                 Generate
+              </Button>
+              <Button
+                variant="contained"
+                sx={{ mt: 3, mb: 2, ml: 2, backgroundColor: "red" }}
+                onClick={handleReset}
+              >
+                Reset
               </Button>
             </Box>
           </Paper>
