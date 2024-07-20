@@ -64,7 +64,31 @@ const updateDirectorate = async (req, res) => {
   }
 };
 
+const getDirectorateReport = async (req, res) => {
+  try {
+    const directorateId = req.params.id;
+    const { startDate, endDate } = req.query;
 
+    // Find the directorate by ID
+    const directorate = await directorateModel.findById(directorateId).populate({
+      path: 'specifications',
+      match: {
+        createdAt: {
+          $gte: startDate ? new Date(startDate) : new Date('1970-01-01'), // Default to earliest date if not provided
+          $lte: endDate ? new Date(new Date(endDate).setHours(23, 59, 59, 999)) : new Date() // Default to current date if not provided
+        }
+      }
+    });
+
+    if (!directorate) {
+      return res.status(404).json({ success: false, message: 'Directorate not found' });
+    }
+
+    res.status(200).json({ status: 200, specifications: directorate.specifications });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 const deleteDirectorate = async (req, res) => {
   const { id } = req.params;
@@ -100,4 +124,4 @@ const alldirectorate = async (req, res) => {
 };
 
 
-export { createDirectorate, updateDirectorate, deleteDirectorate, alldirectorate };
+export { createDirectorate, updateDirectorate, deleteDirectorate, alldirectorate, getDirectorateReport };

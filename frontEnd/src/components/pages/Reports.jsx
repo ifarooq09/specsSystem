@@ -57,12 +57,12 @@ const Reports = () => {
         }));
       } else if (selectedGroup === "directorates") {
         formattedData = data.map((directorate) => ({
-          value: directorate.name,
+          value: directorate._id,
           display: directorate.name,
         }));
       } else if (selectedGroup === "categories") {
         formattedData = data.map((category) => ({
-          value: category.categoryName,
+          value: category._id,
           display: category.categoryName,
         }));
       }
@@ -120,6 +120,9 @@ const Reports = () => {
     }
     
   };
+
+  console.log(group)
+  console.log(selectedSubGroup)
 
   return (
     <>
