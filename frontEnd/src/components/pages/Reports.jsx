@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Sidebar from "../layout/Sidebar";
 import {
   Box,
@@ -10,11 +11,11 @@ import {
   MenuItem,
   Button,
 } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
-import { useState } from "react";
 
 const Reports = () => {
   const [startDate, setStartDate] = useState(dayjs());
@@ -22,6 +23,8 @@ const Reports = () => {
   const [group, setGroup] = useState("");
   const [subGroup, setSubGroup] = useState([]);
   const [selectedSubGroup, setSelectedSubGroup] = useState("");
+  const [reportData, setReportData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleGroupChange = async (event) => {
     const selectedGroup = event.target.value;
@@ -110,6 +113,7 @@ const Reports = () => {
     }
 
     try {
+      setLoading(true);
       const res = await fetch(url, {
         method: "GET",
         headers: {
@@ -124,20 +128,29 @@ const Reports = () => {
       }
 
       const data = await res.json();
-      console.log(data);
+      setReportData(data.specifications || data.specs || []);
     } catch (error) {
       console.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleReset = () => {
-    // Reset fields except endDate
-    setStartDate(dayjs()); 
+    setStartDate(dayjs());
     setEndDate(dayjs());
-    setGroup(""); 
-    setSubGroup([]); 
-    setSelectedSubGroup(""); 
+    setGroup("");
+    setSubGroup([]);
+    setSelectedSubGroup("");
+    setReportData([]);
   };
+
+  const columns = [
+    { field: "uniqueNumber", headerName: "Unique Number", width: 150 },
+    { field: "document", headerName: "Document", width: 200 },
+    { field: "createdAt", headerName: "Created At", width: 200 },
+    { field: "updatedAt", headerName: "Updated At", width: 200 },
+  ];
 
   return (
     <>
@@ -243,6 +256,17 @@ const Reports = () => {
                 Reset
               </Button>
             </Box>
+            {reportData.length > 0 && (
+              <Box sx={{ height: 400, width: "100%", mt: 3 }}>
+                <DataGrid
+                  rows={reportData.map((item, index) => ({ id: index, ...item }))}
+                  columns={columns}
+                  pageSize={5}
+                  rowsPerPageOptions={[5]}
+                  loading={loading}
+                />
+              </Box>
+            )}
           </Paper>
         </Box>
       </Box>

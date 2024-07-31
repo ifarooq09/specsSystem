@@ -82,10 +82,9 @@ const deleteCategory = async (req, res) => {
 }
 
 const getCategoryReport = async (req, res) => {
-
     try {
-        const categoryId = req.params.id
-        const { startDate, endDate } = req.query
+        const categoryId = req.params.id;
+        const { startDate, endDate } = req.query;
 
         const category = await categoryModel.findById(categoryId).populate({
             path: 'specifications',
@@ -95,19 +94,30 @@ const getCategoryReport = async (req, res) => {
                     $lte: endDate ? new Date(new Date(endDate).setHours(23, 59, 59, 999)) : new Date() // Default to current date if not provided
                 }
             }
-        })
+        });
 
         if (!category) {
             return res.status(404).json({ success: false, message: 'Category not found' });
         }
 
-        res.status(200).json({ status: 200, specifications: category.specifications });
+        // Filter specifications to include only those with matching category ID
+        const filteredSpecifications = category.specifications.map(spec => {
+            return {
+                ...spec._doc,
+                specifications: spec.specifications.filter(subSpec => subSpec.category.toString() === categoryId)
+            };
+        }).filter(spec => spec.specifications.length > 0);
+
+        res.status(200).json({
+            status: 200,
+            categoryReport: filteredSpecifications
+        });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
+};
 
-}
 
 const allCategories = async (req, res) => {
     try {

@@ -155,11 +155,11 @@ const getUserReport = async (req, res) => {
             queryConditions.createdAt = dateFilter;
         }
 
-        const specs = await specModel.find(queryConditions)
+        const specifications = await specModel.find(queryConditions)
             .populate('createdBy', 'firstName lastName')
             .populate('updatedBy', 'firstName lastName');
 
-        res.status(200).json({ status: 200, specs });
+        res.status(200).json({ status: 200, userReport: specifications });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

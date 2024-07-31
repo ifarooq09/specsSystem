@@ -84,7 +84,7 @@ const getDirectorateReport = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Directorate not found' });
     }
 
-    res.status(200).json({ status: 200, specifications: directorate.specifications });
+    res.status(200).json({ status: 200, directorateReport: directorate.specifications });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
