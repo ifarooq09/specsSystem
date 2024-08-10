@@ -90,19 +90,29 @@ const Reports = () => {
     setSelectedSubGroup(event.target.value);
   };
 
+  const columns = [
+    { field: "uniqueNumber", headerName: "Form Number", width: 150 },
+    { field: "directorate", headerName: "Directorate", width: 200 },
+    { field: "category", headerName: "Category", width: 200 },
+    { field: "description", headerName: "Description", width: 300 },
+    { field: "warranty", headerName: "Warranty", width: 150 },
+    { field: "createdAt", headerName: "Created At", width: 180 },
+    { field: "updatedAt", headerName: "Updated At", width: 180 },
+  ];
+  
   const generateReport = async (event) => {
     event.preventDefault();
-
+  
     let token = localStorage.getItem("usersdatatoken");
-
+  
     if (!token) {
       alert("No user token found");
       return;
     }
-
+  
     const formattedStartDate = startDate.format("YYYY-MM-DD");
     const formattedEndDate = endDate.format("YYYY-MM-DD");
-
+  
     let url = "http://localhost:3000/";
     if (group === "all") {
       url += "specifications";
@@ -111,7 +121,7 @@ const Reports = () => {
     } else {
       url += `${group}/${selectedSubGroup}?startDate=${formattedStartDate}&endDate=${formattedEndDate}`;
     }
-
+  
     try {
       setLoading(true);
       const res = await fetch(url, {
@@ -122,13 +132,35 @@ const Reports = () => {
           Accept: "application/json",
         },
       });
-
+  
       if (!res.ok) {
         throw new Error(`Error fetching report: ${res.statusText}`);
       }
-
+  
       const data = await res.json();
-      setReportData(data.specifications || data.specs || []);
+  
+      if (data && data.userReport) {
+        const formattedData = data.userReport.flatMap((item) => {
+          return item.specifications.map((spec, index) => {
+            // Format the description for each specification
+            const formattedDescription = spec.description.split("-").join("\n-");
+              
+            return {
+              id: `${item._id}-${index}`,
+              uniqueNumber: item.uniqueNumber,
+              directorate: item.directorate.name,
+              category: spec.category.categoryName,
+              description: formattedDescription, // Use the reformatted description
+              warranty: spec.warranty,
+              createdAt: new Date(item.createdAt).toLocaleString(),
+              updatedAt: new Date(item.updatedAt).toLocaleString(),
+            };
+          });
+        });
+      
+        setReportData(formattedData);
+      }
+      
     } catch (error) {
       console.error(error.message);
     } finally {
@@ -144,13 +176,6 @@ const Reports = () => {
     setSelectedSubGroup("");
     setReportData([]);
   };
-
-  const columns = [
-    { field: "uniqueNumber", headerName: "Unique Number", width: 150 },
-    { field: "document", headerName: "Document", width: 200 },
-    { field: "createdAt", headerName: "Created At", width: 200 },
-    { field: "updatedAt", headerName: "Updated At", width: 200 },
-  ];
 
   return (
     <>
@@ -257,9 +282,9 @@ const Reports = () => {
               </Button>
             </Box>
             {reportData.length > 0 && (
-              <Box sx={{ height: 400, width: "100%", mt: 3 }}>
+              <Box sx={{ height: 800, width: "100%", mt: 3 }}>
                 <DataGrid
-                  rows={reportData.map((item, index) => ({ id: index, ...item }))}
+                  rows={reportData}
                   columns={columns}
                   pageSize={5}
                   rowsPerPageOptions={[5]}

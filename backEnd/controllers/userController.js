@@ -157,7 +157,15 @@ const getUserReport = async (req, res) => {
 
         const specifications = await specModel.find(queryConditions)
             .populate('createdBy', 'firstName lastName')
-            .populate('updatedBy', 'firstName lastName');
+            .populate('updatedBy', 'firstName lastName')
+            .populate({
+                path: 'specifications.category',
+                select: 'categoryName' 
+            })
+            .populate({
+                path: 'directorate',
+                select: 'name' 
+            });
 
         res.status(200).json({ status: 200, userReport: specifications });
     } catch (error) {
