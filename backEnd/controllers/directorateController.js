@@ -72,19 +72,32 @@ const getDirectorateReport = async (req, res) => {
     // Find the directorate by ID
     const directorate = await directorateModel.findById(directorateId).populate({
       path: 'specifications',
+      select: '-directorate -document',
       match: {
         createdAt: {
           $gte: startDate ? new Date(startDate) : new Date('1970-01-01'), // Default to earliest date if not provided
           $lte: endDate ? new Date(new Date(endDate).setHours(23, 59, 59, 999)) : new Date() // Default to current date if not provided
         }
-      }
+      },
+      populate: {
+        path: 'specifications.category',
+        select: 'categoryName -_id',
+        strictPopulate: false,
+      },
     });
 
     if (!directorate) {
       return res.status(404).json({ success: false, message: 'Directorate not found' });
     }
 
-    res.status(200).json({ status: 200, directorateReport: directorate.specifications });
+    res.status(200).json({
+      status: 200,
+      directorateReport: {
+        name: directorate.name,
+        specifications: directorate.specifications,
+      }
+    });
+    
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

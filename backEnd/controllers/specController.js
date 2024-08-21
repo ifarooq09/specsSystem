@@ -41,7 +41,10 @@ const createSpec = async (req, res) => {
 const allSpecifications = async (req, res) => {
   try {
     const specifications = await specModel.find().populate('directorate').populate('specifications.category').exec();
-    res.status(200).json(specifications);
+    res.status(200).json({
+      status: 200,
+      specReport: specifications
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

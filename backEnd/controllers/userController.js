@@ -81,7 +81,7 @@ const validuser = async (req, res) => {
 
 const alluser = async (req, res) => {
     try {
-        const users = await userModel.find({});
+        const users = await userModel.find({}).select('-password -tokens');
         res.status(200).json(users);
     } catch (error) {
         console.error('Error fetching users:', error.message);

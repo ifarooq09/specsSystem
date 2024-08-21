@@ -25,6 +25,7 @@ const AllSpecifications = () => {
   const navigate = useNavigate();
   const [specifications, setSpecifications] = useState([]);
   const [filteredSpecifications, setFilteredSpecifications] = useState([]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const itemsPerPage = 8;
@@ -46,8 +47,9 @@ const AllSpecifications = () => {
             },
           }
         );
-        setSpecifications(response.data);
-        setFilteredSpecifications(response.data); // Set initial filtered data
+        console.log("API Response:", response.data); // Log the response
+        setSpecifications(response.data.specReport || []); // Ensure it's an array
+        setFilteredSpecifications(response.data.specReport || []); // Ensure it's an array
       } catch (error) {
         console.error(error);
       }
@@ -81,21 +83,17 @@ const AllSpecifications = () => {
       }
 
       // Fetch the latest data after deletion
-      const response = await axios.get(
-        "http://localhost:3000/specifications",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get("http://localhost:3000/specifications", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setSpecifications(response.data);
       setFilteredSpecifications(response.data); // Update filtered data
-
     } catch (error) {
       console.error("Error deleting category:", error.message);
     }
-  }
+  };
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
@@ -174,70 +172,71 @@ const AllSpecifications = () => {
           </Button>
         </Paper>
         <Grid container spacing={3} sx={{ mt: 3 }}>
-          {filteredSpecifications
-            .slice()
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-            .slice((page - 1) * itemsPerPage, page * itemsPerPage)
-            .map((spec) => (
-              <Grid item key={spec._id} xs={12} sm={6} md={4} lg={3}>
-                <Card
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    "&:hover": {
-                      boxShadow: 6,
-                    },
-                  }}
-                >
-                  <CardActionArea
-                    sx={{ flexGrow: 1 }}
-                    onClick={() => handleCardClick(spec._id)}
+          {Array.isArray(filteredSpecifications) &&
+            filteredSpecifications
+              .slice()
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .slice((page - 1) * itemsPerPage, page * itemsPerPage)
+              .map((spec) => (
+                <Grid item key={spec._id} xs={12} sm={6} md={4} lg={3}>
+                  <Card
+                    sx={{
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      "&:hover": {
+                        boxShadow: 6,
+                      },
+                    }}
                   >
-                    <CardMedia
-                      component="img"
-                      height="300"
-                      image={`http://localhost:3000/${spec.document}`}
-                      alt="Document Thumbnail"
-                    />
-                    <CardContent
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
+                    <CardActionArea
+                      sx={{ flexGrow: 1 }}
+                      onClick={() => handleCardClick(spec._id)}
                     >
-                      <Typography gutterBottom variant="h5" component="div">
-                        {spec.uniqueNumber}
-                      </Typography>
-                      <div>
-                        <Fab
-                          size="small"
-                          color="primary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditClick(spec._id);
-                          }}
-                        >
-                          <EditIcon />
-                        </Fab>
-                        <Fab
-                          size="small"
-                          color="secondary"
-                          sx={{ ml: 2 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(spec._id);
-                          }}
-                        >
-                          <DeleteIcon />
-                        </Fab>
-                      </div>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
-              </Grid>
-            ))}
+                      <CardMedia
+                        component="img"
+                        height="300"
+                        image={`http://localhost:3000/${spec.document}`}
+                        alt="Document Thumbnail"
+                      />
+                      <CardContent
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Typography gutterBottom variant="h5" component="div">
+                          {spec.uniqueNumber}
+                        </Typography>
+                        <div>
+                          <Fab
+                            size="small"
+                            color="primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditClick(spec._id);
+                            }}
+                          >
+                            <EditIcon />
+                          </Fab>
+                          <Fab
+                            size="small"
+                            color="secondary"
+                            sx={{ ml: 2 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(spec._id);
+                            }}
+                          >
+                            <DeleteIcon />
+                          </Fab>
+                        </div>
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
+                </Grid>
+              ))}
         </Grid>
         <Pagination
           count={Math.ceil(filteredSpecifications.length / itemsPerPage)}

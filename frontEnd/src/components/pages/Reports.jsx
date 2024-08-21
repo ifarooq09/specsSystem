@@ -11,7 +11,11 @@ import {
   MenuItem,
   Button,
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridToolbarContainer,
+  GridToolbarExport,
+} from "@mui/x-data-grid";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -94,25 +98,25 @@ const Reports = () => {
     { field: "uniqueNumber", headerName: "Form Number", width: 150 },
     { field: "directorate", headerName: "Directorate", width: 200 },
     { field: "category", headerName: "Category", width: 200 },
-    { field: "description", headerName: "Description", width: 300 },
+    { field: "description", headerName: "Description", width: 500 },
     { field: "warranty", headerName: "Warranty", width: 150 },
     { field: "createdAt", headerName: "Created At", width: 180 },
     { field: "updatedAt", headerName: "Updated At", width: 180 },
   ];
-  
+
   const generateReport = async (event) => {
     event.preventDefault();
-  
+
     let token = localStorage.getItem("usersdatatoken");
-  
+
     if (!token) {
       alert("No user token found");
       return;
     }
-  
+
     const formattedStartDate = startDate.format("YYYY-MM-DD");
     const formattedEndDate = endDate.format("YYYY-MM-DD");
-  
+
     let url = "http://localhost:3000/";
     if (group === "all") {
       url += "specifications";
@@ -121,7 +125,7 @@ const Reports = () => {
     } else {
       url += `${group}/${selectedSubGroup}?startDate=${formattedStartDate}&endDate=${formattedEndDate}`;
     }
-  
+
     try {
       setLoading(true);
       const res = await fetch(url, {
@@ -132,19 +136,21 @@ const Reports = () => {
           Accept: "application/json",
         },
       });
-  
+
       if (!res.ok) {
         throw new Error(`Error fetching report: ${res.statusText}`);
       }
-  
+
       const data = await res.json();
-  
+
       if (data && data.userReport) {
         const formattedData = data.userReport.flatMap((item) => {
           return item.specifications.map((spec, index) => {
             // Format the description for each specification
-            const formattedDescription = spec.description.split("-").join("\n-");
-              
+            const formattedDescription = spec.description
+              .split("-")
+              .join("\n• ");
+
             return {
               id: `${item._id}-${index}`,
               uniqueNumber: item.uniqueNumber,
@@ -157,10 +163,85 @@ const Reports = () => {
             };
           });
         });
-      
+        setReportData(formattedData);
+      } else if (data && data.directorateReport) {
+        // Destructure directorateReport from data
+        const { name, specifications } = data.directorateReport;
+
+        // Format the data
+        const formattedData = specifications.flatMap((specification) => {
+          return specification.specifications.map((spec, index) => {
+            // Format the description for each specification
+            const formattedDescription = spec.description
+              .split("-")
+              .join("\n• ");
+
+            return {
+              id: `${specification._id}-${index}`,
+              uniqueNumber: specification.uniqueNumber,
+              directorate: name, // Use the directorate name from the top level
+              category: spec.category.categoryName, // Use the category name from the specification
+              description: formattedDescription, // Use the reformatted description
+              warranty: spec.warranty,
+              createdAt: new Date(specification.createdAt).toLocaleString(),
+              updatedAt: new Date(specification.updatedAt).toLocaleString(),
+            };
+          });
+        });
+
+        setReportData(formattedData);
+      } else if (data && data.categoryReport) {
+        // Destructure categoryReport from data
+        const { categoryReport } = data;
+
+        // Format the data
+        const formattedData = categoryReport.flatMap((report) => {
+          return report.specifications.map((spec, index) => {
+            // Format the description for each specification
+            const formattedDescription = spec.description
+              .split("-")
+              .join("\n• ");
+
+            return {
+              id: `${report._id}-${index}`,
+              uniqueNumber: report.uniqueNumber,
+              directorate: report.directorate.name, // Use the directorate name from the report
+              category: spec.category.categoryName, // Use the category name from the specification
+              description: formattedDescription, // Use the reformatted description
+              warranty: spec.warranty,
+              createdAt: new Date(report.createdAt).toLocaleString(),
+              updatedAt: new Date(report.updatedAt).toLocaleString(),
+            };
+          });
+        });
+
+        setReportData(formattedData);
+      } else if (data && data.specReport) {
+        const { specReport } = data;
+
+        // Format the data
+        const formattedData = specReport.flatMap((report) => {
+          return report.specifications.map((spec, index) => {
+            // Format the description for each specification
+            const formattedDescription = spec.description
+              .split("-")
+              .join("\n• ");
+
+            return {
+              id: `${report._id}-${index}`,
+              uniqueNumber: report.uniqueNumber,
+              directorate: report.directorate.name, // Use the directorate name from the report
+              category: spec.category.categoryName, // Use the category name from the specification
+              description: formattedDescription, // Use the reformatted description
+              warranty: spec.warranty,
+              createdAt: new Date(report.createdAt).toLocaleString(),
+              updatedAt: new Date(report.updatedAt).toLocaleString(),
+            };
+          });
+        });
+
         setReportData(formattedData);
       }
-      
     } catch (error) {
       console.error(error.message);
     } finally {
@@ -289,6 +370,24 @@ const Reports = () => {
                   pageSize={5}
                   rowsPerPageOptions={[5]}
                   loading={loading}
+                  slots={{
+                    toolbar: () => {
+                      return (
+                        <GridToolbarContainer
+                          sx={{
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          <GridToolbarExport
+                            csvOptions={{
+                              fileName: "Report",
+                              utf8WithBom: true,
+                            }}
+                          />
+                        </GridToolbarContainer>
+                      );
+                    },
+                  }}
                 />
               </Box>
             )}
