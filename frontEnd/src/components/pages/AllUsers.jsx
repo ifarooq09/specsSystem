@@ -1,4 +1,4 @@
-import { Box, Paper, Typography, Button, IconButton } from "@mui/material";
+import { Box, Paper, Typography, Button, IconButton, Alert } from "@mui/material";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ const AllUsers = () => {
   const [users, setUsers] = useState([]);
   const [rowId, setRowId] = useState(null);
   const [showPassword, setShowPassword] = useState({});
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     let token = localStorage.getItem("usersdatatoken");
@@ -34,13 +35,18 @@ const AllUsers = () => {
         });
 
         if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
+          if (res.status === 403) {
+            setErrorMessage("You do not have permission to view this content.");
+          } else {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+        } else {
+          const data = await res.json();
+          setUsers(data);
         }
-
-        const data = await res.json();
-        setUsers(data);
       } catch (error) {
         console.error("Error fetching users:", error.message);
+        setErrorMessage("An error occurred while fetching users.");
       }
     };
 
@@ -117,7 +123,7 @@ const AllUsers = () => {
       headerName: "Role",
       flex: 1,
       type: "singleSelect",
-      valueOptions: ["admin", "user"],
+      valueOptions: ["admin", "editor"],
       editable: true,
     },
     {
@@ -188,40 +194,51 @@ const AllUsers = () => {
           <Typography component="h1" variant="h5">
             All Users
           </Typography>
-          <Button
-            variant="contained"
-            color="success"
-            sx={{
-              width: "15%",
-              p: 1,
-              mt: 2,
-            }}
-            onClick={() => navigate("createUser")}
-          >
-            Add User
-          </Button>
-          <div style={{ height: 400, width: "100%", marginTop: 20 }}>
-            <DataGrid
-              columns={columns}
-              rows={rows}
-              getRowSpacing={(params) => ({
-                top: params.isFirstVisible ? 0 : 5,
-                bottom: params.isLastVisible ? 0 : 5,
-              })}
-              sx={{
-                [`& .${gridClasses.row}`]: {
-                  bgcolor: (theme) =>
-                    theme.palette.mode === "light" ? grey[200] : grey[700],
-                },
-              }}
-              onCellEditStart={(params) => setRowId(params.id)}
-              onCellEditStop={(params) => setShowPassword((prev) => ({ ...prev, [params.id]: false }))}
-              processRowUpdate={(newRow) => {
-                handleSave(newRow);
-                return newRow;
-              }}
-            />
-          </div>
+          {errorMessage && (
+            <Alert severity="error" sx={{ my: 2 }}>
+              {errorMessage}
+            </Alert>
+          )}
+          {!errorMessage && (
+            <>
+              <Button
+                variant="contained"
+                color="success"
+                sx={{
+                  width: "15%",
+                  p: 1,
+                  mt: 2,
+                }}
+                onClick={() => navigate("createUser")}
+              >
+                Add User
+              </Button>
+              <div style={{ height: 400, width: "100%", marginTop: 20 }}>
+                <DataGrid
+                  columns={columns}
+                  rows={rows}
+                  getRowSpacing={(params) => ({
+                    top: params.isFirstVisible ? 0 : 5,
+                    bottom: params.isLastVisible ? 0 : 5,
+                  })}
+                  sx={{
+                    [`& .${gridClasses.row}`]: {
+                      bgcolor: (theme) =>
+                        theme.palette.mode === "light" ? grey[200] : grey[700],
+                    },
+                  }}
+                  onCellEditStart={(params) => setRowId(params.id)}
+                  onCellEditStop={(params) =>
+                    setShowPassword((prev) => ({ ...prev, [params.id]: false }))
+                  }
+                  processRowUpdate={(newRow) => {
+                    handleSave(newRow);
+                    return newRow;
+                  }}
+                />
+              </div>
+            </>
+          )}
         </Paper>
       </Box>
     </>

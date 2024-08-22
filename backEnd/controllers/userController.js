@@ -79,6 +79,21 @@ const validuser = async (req, res) => {
     }
 };
 
+const getRole = async (req, res) => {
+    try {
+        const user = await userModel.findById(req.userId).select('role'); // Fetch user by ID and select only the role field
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({ role: user.role }); // Return user role
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error });
+    }
+
+}
+
 const alluser = async (req, res) => {
     try {
         const users = await userModel.find({}).select('-password -tokens');
@@ -160,11 +175,11 @@ const getUserReport = async (req, res) => {
             .populate('updatedBy', 'firstName lastName')
             .populate({
                 path: 'specifications.category',
-                select: 'categoryName' 
+                select: 'categoryName'
             })
             .populate({
                 path: 'directorate',
-                select: 'name' 
+                select: 'name'
             });
 
         res.status(200).json({ status: 200, userReport: specifications });
@@ -188,4 +203,4 @@ const logout = async (req, res) => {
     }
 };
 
-export { createUser, login, validuser, logout, alluser, updateUser, editProfile, getUserReport };
+export { createUser, login, validuser, logout, alluser, updateUser, editProfile, getUserReport, getRole};

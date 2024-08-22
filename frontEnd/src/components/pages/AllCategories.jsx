@@ -2,8 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Box, Paper, Typography, Fab } from "@mui/material";
 import { Button } from "@mui/material";
-import { DataGrid, GridToolbarContainer,
-  GridToolbarExport, gridClasses } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridToolbarContainer,
+  GridToolbarExport,
+  gridClasses,
+} from "@mui/x-data-grid";
 import { grey } from "@mui/material/colors";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -11,6 +15,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 const AllCategories = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
     let token = localStorage.getItem("usersdatatoken");
@@ -40,9 +45,33 @@ const AllCategories = () => {
       } catch (error) {
         console.error("Error fetching Categories:", error.message);
       }
-    }; 
+    };
 
-    fetchCategories(); 
+    const fetchUserRole = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/users/me", {
+          // Ensure this URL matches the route on your server
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log("User role fetched:", data.role); // Log the fetched role
+        setUserRole(data.role); // Save the user's role
+      } catch (error) {
+        console.error("Error fetching user role:", error.message);
+      }
+    };
+
+    fetchCategories();
+    fetchUserRole();
   }, []);
 
   const handleUpdate = async (id, newName) => {
@@ -64,7 +93,6 @@ const AllCategories = () => {
 
       const { updatedCategory } = await res.json();
 
-      // Update categories state with the updated category
       setCategories((prevCategories) =>
         prevCategories.map((cat) =>
           cat._id === updatedCategory._id ? updatedCategory : cat
@@ -76,6 +104,11 @@ const AllCategories = () => {
   };
 
   const handleDelete = async (id) => {
+    if (userRole !== "admin") {
+      alert("You do not have permission to delete categories.");
+      return;
+    }
+
     let token = localStorage.getItem("usersdatatoken");
     try {
       const res = await fetch(`http://localhost:3000/categories/${id}`, {
@@ -201,12 +234,14 @@ const AllCategories = () => {
               slots={{
                 toolbar: () => {
                   return (
-                    <GridToolbarContainer sx={{
-                      justifyContent: 'flex-end'
-                    }}>
-                      <GridToolbarExport 
+                    <GridToolbarContainer
+                      sx={{
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      <GridToolbarExport
                         csvOptions={{
-                          fileName: 'categories',
+                          fileName: "categories",
                           utf8WithBom: true,
                         }}
                       />

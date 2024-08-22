@@ -12,10 +12,10 @@ import { grey } from "@mui/material/colors";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-
 const AllDirectorates = () => {
   const navigate = useNavigate();
   const [directorates, setDirectorates] = useState([]);
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
     let token = localStorage.getItem("usersdatatoken");
@@ -47,7 +47,31 @@ const AllDirectorates = () => {
       }
     };
 
+    const fetchUserRole = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/users/me", {
+          // Ensure this URL matches the route on your server
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log("User role fetched:", data.role); // Log the fetched role
+        setUserRole(data.role); // Save the user's role
+      } catch (error) {
+        console.error("Error fetching user role:", error.message);
+      }
+    };
+
     fetchDirectorates();
+    fetchUserRole();
   }, []);
 
   const handleUpdate = async (id, newName) => {
@@ -81,6 +105,11 @@ const AllDirectorates = () => {
   };
 
   const handleDelete = async (id) => {
+    if (userRole !== "admin") {
+      alert("You do not have permission to delete categories.");
+      return;
+    }
+
     let token = localStorage.getItem("usersdatatoken");
     try {
       const res = await fetch(`http://localhost:3000/directorates/${id}`, {
@@ -199,12 +228,14 @@ const AllDirectorates = () => {
               slots={{
                 toolbar: () => {
                   return (
-                    <GridToolbarContainer sx={{
-                      justifyContent: 'flex-end'
-                    }}>
-                      <GridToolbarExport 
+                    <GridToolbarContainer
+                      sx={{
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      <GridToolbarExport
                         csvOptions={{
-                          fileName: 'directorates',
+                          fileName: "directorates",
                           utf8WithBom: true,
                         }}
                       />

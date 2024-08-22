@@ -210,7 +210,6 @@ export default function Sidebar() {
                   <MenuItem
                     onClick={() => {
                       logOut();
-                      handleClose();
                     }}
                   >
                     Logout

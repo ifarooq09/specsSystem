@@ -25,9 +25,9 @@ const AllSpecifications = () => {
   const navigate = useNavigate();
   const [specifications, setSpecifications] = useState([]);
   const [filteredSpecifications, setFilteredSpecifications] = useState([]);
-
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [userRole, setUserRole] = useState("");
   const itemsPerPage = 8;
 
   useEffect(() => {
@@ -37,6 +37,7 @@ const AllSpecifications = () => {
       alert("No user token found");
       return;
     }
+
     const fetchData = async () => {
       try {
         const response = await axios.get(
@@ -49,14 +50,45 @@ const AllSpecifications = () => {
         );
         console.log("API Response:", response.data); // Log the response
         setSpecifications(response.data.specReport || []); // Ensure it's an array
-        setFilteredSpecifications(response.data.specReport || []); // Ensure it's an array
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching specifications:", error);
+      }
+    };
+
+    const fetchUserRole = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/users/me", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log("User role fetched:", data.role); // Log the fetched role
+        setUserRole(data.role); // Save the user's role
+      } catch (error) {
+        console.error("Error fetching user role:", error.message);
       }
     };
 
     fetchData();
+    fetchUserRole();
   }, []);
+
+  useEffect(() => {
+    // Filter specifications whenever the search query or specifications change
+    const filteredData = specifications.filter((spec) =>
+      spec.uniqueNumber.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredSpecifications(filteredData);
+    setPage(1); // Reset to the first page when search query changes
+  }, [searchQuery, specifications]);
 
   const handleCardClick = (id) => {
     navigate(`/specifications/${id}`);
@@ -67,6 +99,11 @@ const AllSpecifications = () => {
   };
 
   const handleDelete = async (id) => {
+    if (userRole !== "admin") {
+      alert("You do not have permission to delete specifications.");
+      return;
+    }
+
     let token = localStorage.getItem("usersdatatoken");
     try {
       const res = await fetch(`http://localhost:3000/specifications/${id}`, {
@@ -88,20 +125,14 @@ const AllSpecifications = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setSpecifications(response.data);
-      setFilteredSpecifications(response.data); // Update filtered data
+      setSpecifications(response.data.specReport || []);
     } catch (error) {
-      console.error("Error deleting category:", error.message);
+      console.error("Error deleting specification:", error.message);
     }
   };
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
-    const filteredData = specifications.filter((spec) =>
-      spec.uniqueNumber.toLowerCase().includes(event.target.value.toLowerCase())
-    );
-    setFilteredSpecifications(filteredData);
-    setPage(1); // Reset to first page on new search
   };
 
   const handleChangePage = (event, value) => {

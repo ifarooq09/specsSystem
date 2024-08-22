@@ -187,7 +187,7 @@ export default function SignUp() {
                       onChange={handleRoleChange}
                     >
                       <MenuItem value="admin">Admin</MenuItem>
-                      <MenuItem value="user">User</MenuItem>
+                      <MenuItem value="editor">Editor</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
