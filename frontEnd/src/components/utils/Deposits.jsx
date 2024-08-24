@@ -1,7 +1,7 @@
 const Deposits = () => {
   return (
     <div>
-      Deposits
+      Total Users
     </div>
   )
 }
