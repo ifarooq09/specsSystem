@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Dasboard from './components/pages/Dasboard';
+import Dashboard from './components/pages/Dashboard';
 import SignIn from './components/SignIn';
 import CreateUser from './components/pages/CreateUser';
 import Error from "./components/Error";
@@ -23,7 +23,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<SignIn />} />
-        <Route path="/dashboard" element={<Dasboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/users" element={<UserLayout />}>
           <Route index element={<AllUsers />} />
           <Route path="createUser" element={<CreateUser />} />
