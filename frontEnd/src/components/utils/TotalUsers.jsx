@@ -18,7 +18,7 @@ const TotalUsers = () => {
 
     const fetchUsers = async () => {
       try {
-        const res = await fetch("http://localhost:3000/users", {
+        const res = await fetch("http://localhost:3000/users/count", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

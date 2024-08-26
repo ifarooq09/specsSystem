@@ -104,6 +104,16 @@ const alluser = async (req, res) => {
     }
 };
 
+const viewUserCount = async (req, res) => {
+    try {
+        const users = await userModel.find({}).select('-password -tokens');
+        res.status(200).json(users);
+    } catch (error) {
+        console.error('Error fetching users:', error.message);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
 const updateUser = async (req, res) => {
     try {
         const { role, active, password } = req.body;
@@ -203,4 +213,4 @@ const logout = async (req, res) => {
     }
 };
 
-export { createUser, login, validuser, logout, alluser, updateUser, editProfile, getUserReport, getRole};
+export { createUser, login, validuser, logout, alluser, updateUser, editProfile, getUserReport, getRole, viewUserCount};
