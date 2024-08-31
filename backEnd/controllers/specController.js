@@ -3,31 +3,44 @@ import directorateModel from "../models/directorateSchema.js";
 import categoryModel from "../models/categorySchema.js";
 import authenticate from "../middleware/authenticate.js";
 import upload from "../middleware/upload.js";
-import { toJalaali } from 'jalaali-js';
+import moment from 'moment-hijri';
 
-// Create an API to generate the unique number
+// Function to convert Arabic numerals to Western numerals
+const convertArabicToWestern = (arabicNumber) => {
+  const arabicToWesternMap = {
+    '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
+    '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9'
+  };
+  
+  return arabicNumber.replace(/[٠-٩]/g, (match) => arabicToWesternMap[match]);
+};
+
 const generateUniqueNumber = async (req, res) => {
   try {
-    const now = new Date();
-    const jalaliDate = toJalaali(now);
+    // Get current Hijri date
+    const now = moment();
+    const hijriDate = now.format('iYYYY-iMM-iDD');
+    
+    // Convert Hijri date to Western numerals
+    const [year, month, day] = hijriDate.split('-').map(convertArabicToWestern);
 
-    const year = jalaliDate.jy;
-    const month = String(jalaliDate.jm).padStart(2, '0');
-    const day = String(jalaliDate.jd).padStart(2, '0');
+    // Convert to native Date object and start of the day
+    const todayStart = moment().startOf('day').toDate();
 
-    const todayStart = new Date(now.setHours(0, 0, 0, 0));
+    // Count documents created today
     const countToday = await specModel.countDocuments({
       createdAt: { $gte: todayStart },
     });
 
+    // Generate unique number
     const uniqueNumber = `${year}-${month}${day}-${countToday + 1}`;
 
     res.status(200).json({ uniqueNumber });
   } catch (error) {
+    console.error("Error generating unique number:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
-
 const createSpec = async (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
