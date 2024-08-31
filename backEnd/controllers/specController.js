@@ -3,6 +3,30 @@ import directorateModel from "../models/directorateSchema.js";
 import categoryModel from "../models/categorySchema.js";
 import authenticate from "../middleware/authenticate.js";
 import upload from "../middleware/upload.js";
+import { toJalaali } from 'jalaali-js';
+
+// Create an API to generate the unique number
+const generateUniqueNumber = async (req, res) => {
+  try {
+    const now = new Date();
+    const jalaliDate = toJalaali(now);
+
+    const year = jalaliDate.jy;
+    const month = String(jalaliDate.jm).padStart(2, '0');
+    const day = String(jalaliDate.jd).padStart(2, '0');
+
+    const todayStart = new Date(now.setHours(0, 0, 0, 0));
+    const countToday = await specModel.countDocuments({
+      createdAt: { $gte: todayStart },
+    });
+
+    const uniqueNumber = `${year}-${month}${day}-${countToday + 1}`;
+
+    res.status(200).json({ uniqueNumber });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 const createSpec = async (req, res) => {
   upload(req, res, async (err) => {
@@ -203,4 +227,4 @@ const deleteItem = async (req, res) => {
   }
 };
 
-export { createSpec, allSpecifications, getSpecs, updateSpec, deleteItem, deleteSpec};
+export { createSpec, allSpecifications, getSpecs, updateSpec, deleteItem, deleteSpec, generateUniqueNumber};

@@ -44,7 +44,7 @@ const AddSpecification = () => {
     }
     const fetchData = async () => {
       try {
-        const [dirRes, catRes] = await Promise.all([
+        const [dirRes, catRes, uniqueNumberRes] = await Promise.all([
           axios.get("http://localhost:3000/directorates", {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -55,9 +55,15 @@ const AddSpecification = () => {
               Authorization: `Bearer ${token}`,
             },
           }),
+          axios.get("http://localhost:3000/generateUniqueNumber", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            }
+          })
         ]);
         setDirectorates(dirRes.data);
         setCategories(catRes.data);
+        setUniqueNumber(uniqueNumberRes.data.uniqueNumber)
 
         // Fetch specification data if id is present
         if (id) {
@@ -261,6 +267,7 @@ const AddSpecification = () => {
                       fullWidth
                       variant="outlined"
                       value={uniqueNumber}
+                      disabled
                       onChange={(e) => setUniqueNumber(e.target.value)}
                       sx={{ mb: 2 }}
                     />
