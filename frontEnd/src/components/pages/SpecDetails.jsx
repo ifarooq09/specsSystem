@@ -158,7 +158,7 @@ const SpecDetails = () => {
     },
     { field: "createdBy", headerName: "Created By", width: 200 },
     { field: "createdAt", headerName: "Created At", width: 180 },
-    { field: "updatedBy", headerName: "Updated By", width: 200 },
+    { field: "updatedBy", headerName: "Updated By", width: 150 },
     { field: "updatedAt", headerName: "Updated At", width: 180 },
     {
       field: "actions",

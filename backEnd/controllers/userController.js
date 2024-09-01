@@ -135,22 +135,28 @@ const editProfile = async (req, res) => {
     try {
         const { firstName, lastName, email, password } = req.body;
 
-        const updateData = {
-            firstName,
-            lastName,
-            email,
-        };
+        const user = await userModel.findById(req.userId);
 
-        if (password) {
-            updateData.password = await bcrypt.hash(password, 12); // Hash the password here
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        const updatedUser = await userModel.findByIdAndUpdate(req.userId, updateData, { new: true });
+        user.firstName = firstName;
+        user.lastName = lastName;
+        user.email = email;
+
+        if (password) {
+            user.password = password; // This will trigger the pre-save middleware to hash the password
+            user.tokens = []; // Clear tokens array when the password is updated
+        }
+
+        const updatedUser = await user.save();
         res.status(200).json({ status: 200, updatedUser });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 
 const getUserReport = async (req, res) => {
     try {
